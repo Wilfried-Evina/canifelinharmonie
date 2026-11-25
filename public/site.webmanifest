@@ -1,0 +1,11 @@
+{
+  "name": "Canifelin Harmonie",
+  "short_name": "Canifelin",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ],
+  "theme_color": "#fbf5ee",
+  "background_color": "#fbf5ee",
+  "display": "browser"
+}

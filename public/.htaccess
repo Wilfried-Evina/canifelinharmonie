@@ -1,0 +1,52 @@
+# Configuration Apache – hébergement Infomaniak
+# Ce fichier est copié tel quel à la racine du site lors du build (dist/.htaccess).
+
+# ---------- Pages d'erreur ----------
+ErrorDocument 404 /404.html
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # ---------- HTTPS obligatoire + domaine sans www ----------
+  RewriteCond %{HTTPS} off [OR]
+  RewriteCond %{HTTP_HOST} ^www\. [NC]
+  RewriteRule ^ https://canifelinharmonie.ch%{REQUEST_URI} [R=301,L,NE]
+
+  # ---------- Anciennes URL du site -> nouvelles pages (301 = conserve le référencement Google) ----------
+  RewriteRule ^prestations-chiens/?$ /garde-a-domicile/#chiens [R=301,L,NE]
+  RewriteRule ^prestations-chats/?$  /garde-a-domicile/#chats  [R=301,L,NE]
+  RewriteRule ^commande-chien/?$     /contact/?animal=chien    [R=301,L,NE]
+  RewriteRule ^commande-chat/?$      /contact/?animal=chat     [R=301,L,NE]
+  RewriteRule ^liens-utile/?$        /liens-utiles/            [R=301,L]
+  RewriteRule ^index\.php$           /                         [R=301,L]
+</IfModule>
+
+# ---------- Compression (pages plus légères) ----------
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml application/javascript application/json application/xml image/svg+xml
+</IfModule>
+
+# ---------- Cache navigateur ----------
+<IfModule mod_headers.c>
+  # Fichiers générés par Astro : leur nom change à chaque modification -> cache 1 an
+  <FilesMatch "\.(webp|avif|jpg|jpeg|png|svg|woff2|css|js)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  # Pages HTML : toujours revérifiées pour voir les mises à jour immédiatement
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+
+  # ---------- En-têtes de sécurité ----------
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+</IfModule>
+
+# Fichiers non hachés (logo, favicon, image de partage) : cache plus court
+<IfModule mod_headers.c>
+  <FilesMatch "^(logo\.svg|favicon\.svg|favicon-32\.png|icon-192\.png|icon-512\.png|apple-touch-icon\.png|og-image\.jpg|site\.webmanifest)$">
+    Header set Cache-Control "public, max-age=604800"
+  </FilesMatch>
+</IfModule>
