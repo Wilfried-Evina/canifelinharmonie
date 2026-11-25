@@ -70,12 +70,18 @@ function env_val(string $key, string $default = ''): string
 /**
  * Envoi SMTP authentifié via STARTTLS (port 587, mail.infomaniak.com).
  */
-function send_smtp(string $to, string $replyTo, string $subject, string $body, string $html = ''): bool
+function send_smtp(string $to, string $replyTo, string $subject, string $body, string $html = '', string $fromName = 'Site Canifelin Harmonie'): bool
 {
     $host = env_val('SMTP_HOST', SMTP_HOST_DEFAULT);
     $port = (int)env_val('SMTP_PORT', (string)SMTP_PORT_DEFAULT);
     $user = env_val('SMTP_USER', FROM);
     $pass = env_val('SMTP_PASS', '');
+    // Adresse d'expédition : SMTP_FROM, sinon le compte SMTP. Une adresse différente de la boîte
+    // de réception évite que la messagerie affiche « Moi » comme expéditeur.
+    $from = env_val('SMTP_FROM', $user);
+    if (!filter_var($from, FILTER_VALIDATE_EMAIL)) {
+        $from = FROM;
+    }
 
     if ($pass === '') {
         return false;
@@ -133,7 +139,7 @@ function send_smtp(string $to, string $replyTo, string $subject, string $body, s
         fclose($fp);
         return false;
     }
-    if (!$cmd('MAIL FROM:<' . FROM . '>', 250) || !$cmd('RCPT TO:<' . $to . '>', 250) || !$cmd('DATA', 354)) {
+    if (!$cmd('MAIL FROM:<' . $from . '>', 250) || !$cmd('RCPT TO:<' . $to . '>', 250) || !$cmd('DATA', 354)) {
         fclose($fp);
         return false;
     }
@@ -144,7 +150,7 @@ function send_smtp(string $to, string $replyTo, string $subject, string $body, s
 
     $head = [
         'Date: ' . date('r'),
-        'From: ' . mb_encode_mimeheader('Site Canifelin Harmonie', 'UTF-8') . ' <' . FROM . '>',
+        'From: ' . mb_encode_mimeheader($fromName, 'UTF-8') . ' <' . $from . '>',
         'To: <' . $to . '>',
         'Reply-To: ' . $replyTo,
         'Subject: ' . mb_encode_mimeheader($subject, 'UTF-8'),
@@ -373,7 +379,9 @@ $headers = implode("\r\n", [
 
 // Priorité à l'envoi SMTP authentifié (mail.infomaniak.com:587 STARTTLS) si SMTP_PASS est défini
 // sur le serveur (.env ou variable d'environnement) ; repli sur mail() natif sinon.
-$sent = send_smtp(TO, $email, $subject, $body, $html);
+// Expéditeur affiché : le nom du visiteur, pour reconnaître la demande d'un coup d'œil
+$fromName = mb_substr(str_replace(['"', '<', '>', ','], '', $nom), 0, 60) . ' via le site';
+$sent = send_smtp(TO, $email, $subject, $body, $html, $fromName);
 // mail() est désactivée sur certains hébergements Infomaniak : on ne l'appelle que si elle existe
 if (!$sent && function_exists('mail')) {
     $sent = @mail(TO, mb_encode_mimeheader($subject, 'UTF-8'), $body, $headers, '-f' . FROM);
