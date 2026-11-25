@@ -70,7 +70,7 @@ function env_val(string $key, string $default = ''): string
 /**
  * Envoi SMTP authentifié via STARTTLS (port 587, mail.infomaniak.com).
  */
-function send_smtp(string $to, string $replyTo, string $subject, string $body): bool
+function send_smtp(string $to, string $replyTo, string $subject, string $body, string $html = ''): bool
 {
     $host = env_val('SMTP_HOST', SMTP_HOST_DEFAULT);
     $port = (int)env_val('SMTP_PORT', (string)SMTP_PORT_DEFAULT);
@@ -138,7 +138,11 @@ function send_smtp(string $to, string $replyTo, string $subject, string $body): 
         return false;
     }
 
-    $msg = implode("\r\n", [
+    // Points en début de ligne doublés, et fins de ligne CRLF obligatoires (pas de « LF » seul,
+    // refusé par les serveurs mail récents)
+    $text = str_replace("\n", "\r\n", preg_replace('/^\./m', '..', str_replace(["\r\n", "\r"], "\n", $body)) ?? $body);
+
+    $head = [
         'Date: ' . date('r'),
         'From: ' . mb_encode_mimeheader('Site Canifelin Harmonie', 'UTF-8') . ' <' . FROM . '>',
         'To: <' . $to . '>',
@@ -146,14 +150,36 @@ function send_smtp(string $to, string $replyTo, string $subject, string $body): 
         'Subject: ' . mb_encode_mimeheader($subject, 'UTF-8'),
         'Message-ID: <' . bin2hex(random_bytes(12)) . '@' . SITE . '>',
         'MIME-Version: 1.0',
-        'Content-Type: text/plain; charset=UTF-8',
-        'Content-Transfer-Encoding: 8bit',
         'X-Mailer: ' . SITE,
-        '',
-        // Points en début de ligne doublés, et fins de ligne CRLF obligatoires (pas de « LF » seul,
-        // refusé par les serveurs mail récents)
-        str_replace("\n", "\r\n", preg_replace('/^\./m', '..', str_replace(["\r\n", "\r"], "\n", $body)) ?? $body),
-    ]);
+    ];
+    if ($html === '') {
+        $parts = array_merge($head, [
+            'Content-Type: text/plain; charset=UTF-8',
+            'Content-Transfer-Encoding: 8bit',
+            '',
+            $text,
+        ]);
+    } else {
+        // Version HTML (avec logo) + version texte pour les messageries qui n'affichent pas le HTML.
+        // Le HTML est encodé en base64 : aucune ligne trop longue, aucun point en début de ligne.
+        $b = 'chf-' . bin2hex(random_bytes(10));
+        $parts = array_merge($head, [
+            'Content-Type: multipart/alternative; boundary="' . $b . '"',
+            '',
+            '--' . $b,
+            'Content-Type: text/plain; charset=UTF-8',
+            'Content-Transfer-Encoding: 8bit',
+            '',
+            $text,
+            '--' . $b,
+            'Content-Type: text/html; charset=UTF-8',
+            'Content-Transfer-Encoding: base64',
+            '',
+            rtrim(chunk_split(base64_encode($html), 76, "\r\n")),
+            '--' . $b . '--',
+        ]);
+    }
+    $msg = implode("\r\n", $parts);
 
     $ok = $cmd($msg . "\r\n.", 250);
     @fwrite($fp, "QUIT\r\n");
@@ -278,6 +304,64 @@ $body = implode("\n", [
     'Pour répondre, utilisez simplement « Répondre » : la réponse ira à ' . $email . '.',
 ]);
 
+// Même e-mail en HTML : logo, champs en tableau, bouton « Répondre » (styles en ligne, compatibles messageries)
+$h = static fn(string $s): string => htmlspecialchars($s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+$or = static fn(string $s): string => $s !== '' ? $s : '-';
+$row = static fn(string $label, string $value): string =>
+    '<tr><td style="padding:9px 16px 9px 0;color:#566673;font-size:14px;white-space:nowrap;vertical-align:top;border-bottom:1px solid #efe5d8">'
+    . $h($label) . '</td><td style="padding:9px 0;color:#1a2a35;font-size:15px;vertical-align:top;border-bottom:1px solid #efe5d8">'
+    . $value . '</td></tr>';
+$small = static fn(string $label, string $value): string =>
+    '<tr><td style="padding:4px 14px 4px 0;color:#566673;font-size:13px;white-space:nowrap;vertical-align:top">' . $h($label)
+    . '</td><td style="padding:4px 0;color:#1a2a35;font-size:13px;vertical-align:top;word-break:break-word">' . $h($value) . '</td></tr>';
+$replyHref = 'mailto:' . rawurlencode($email) . '?subject=' . rawurlencode('Re: Votre demande – ' . $prestation);
+$telLink = $telephone !== ''
+    ? '<a href="tel:' . $h(preg_replace('/[^\d+]/', '', $telephone) ?? '') . '" style="color:#2770a6;text-decoration:none">' . $h($telephone) . '</a>'
+    : '-';
+
+$html = '<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+    . '<title>' . $h($subject) . '</title></head>'
+    . '<body style="margin:0;padding:0;background:#fbf5ee;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Helvetica,Arial,sans-serif">'
+    . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#fbf5ee"><tr><td align="center" style="padding:32px 16px">'
+    . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px">'
+    // En-tête : logo + nom
+    . '<tr><td align="center" style="padding:0 0 22px">'
+    . '<img src="https://' . SITE . '/email-logo.png" width="72" height="68" alt="Canifelin Harmonie" style="display:block;border:0;margin:0 auto 10px">'
+    . '<div style="font-size:15px;font-weight:600;color:#0f2c3d">Canifelin Harmonie</div>'
+    . '</td></tr>'
+    // Carte
+    . '<tr><td style="background:#ffffff;border-radius:20px;padding:32px 28px">'
+    . '<h1 style="margin:0 0 6px;font-size:22px;line-height:1.25;font-weight:600;color:#0f2c3d;text-align:center">Nouvelle demande de rendez-vous</h1>'
+    . '<p style="margin:0 0 24px;font-size:14px;color:#566673;text-align:center">Reçue via le site le ' . $h(date('d.m.Y à H:i')) . '</p>'
+    . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0">'
+    . $row('Nom', $h($nom))
+    . $row('E-mail', '<a href="mailto:' . $h($email) . '" style="color:#2770a6;text-decoration:none">' . $h($email) . '</a>')
+    . $row('Téléphone', $telLink)
+    . $row('Animal', $h($animal))
+    . $row('Prestation', $h($prestation))
+    . $row('Nom, âge, race', $h($or($infosAnimal)))
+    . '</table>'
+    . '<p style="margin:24px 0 8px;font-size:14px;font-weight:600;color:#0f2c3d">Message</p>'
+    . '<div style="background:#fbf5ee;border-radius:14px;padding:16px 18px;font-size:15px;line-height:1.6;color:#1a2a35">'
+    . nl2br($h($message)) . '</div>'
+    . '<table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:28px auto 4px"><tr>'
+    . '<td style="background:#3185c5;border-radius:999px"><a href="' . $h($replyHref) . '" style="display:inline-block;padding:13px 28px;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none">Répondre à ' . $h($nom) . '</a></td>'
+    . '</tr></table>'
+    . '</td></tr>'
+    // Origine du contact
+    . '<tr><td style="padding:22px 28px 0">'
+    . '<p style="margin:0 0 6px;font-size:13px;font-weight:600;color:#0f2c3d">Origine du contact</p>'
+    . '<table role="presentation" cellpadding="0" cellspacing="0">'
+    . $small('Comment m’avez-vous connue', $or($source))
+    . $small('Arrivée sur la page', $or($arrivee))
+    . $small('Venu de', $or($provenance))
+    . $small('Campagne', $or($campagne))
+    . $small('Formulaire rempli sur', $or($page))
+    . '</table>'
+    . '<p style="margin:18px 0 0;font-size:12px;color:#8a97a1;text-align:center">Vous pouvez aussi simplement cliquer sur « Répondre » : la réponse ira à ' . $h($email) . '.</p>'
+    . '</td></tr>'
+    . '</table></td></tr></table></body></html>';
+
 $headers = implode("\r\n", [
     'From: ' . mb_encode_mimeheader('Site Canifelin Harmonie', 'UTF-8') . ' <' . FROM . '>',
     'Reply-To: ' . $email,
@@ -289,7 +373,7 @@ $headers = implode("\r\n", [
 
 // Priorité à l'envoi SMTP authentifié (mail.infomaniak.com:587 STARTTLS) si SMTP_PASS est défini
 // sur le serveur (.env ou variable d'environnement) ; repli sur mail() natif sinon.
-$sent = send_smtp(TO, $email, $subject, $body);
+$sent = send_smtp(TO, $email, $subject, $body, $html);
 // mail() est désactivée sur certains hébergements Infomaniak : on ne l'appelle que si elle existe
 if (!$sent && function_exists('mail')) {
     $sent = @mail(TO, mb_encode_mimeheader($subject, 'UTF-8'), $body, $headers, '-f' . FROM);
