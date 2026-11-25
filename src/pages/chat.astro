@@ -160,7 +160,7 @@ const serviceSchema = {
   description:
     'Consultations en comportement du chat à domicile à Genève ou en ligne : élimination hors litière, conflits entre chats, miaulements nocturnes, soins coopératifs et garde à domicile.',
   provider: { '@id': `${site.url}/#business` },
-  areaServed: ['Genève', 'Grand-Lancy', 'Lancy', 'Carouge', 'Onex', 'Plan-les-Ouates', 'Bernex', 'Veyrier', 'Vernier', 'Suisse romande', 'France voisine'],
+  areaServed: ['Genève', 'Grand-Lancy', 'Lancy', 'Carouge', 'Onex', 'Plan-les-Ouates', 'Bernex', 'Veyrier', 'Vernier', 'Canton de Genève', 'Suisse', 'France'],
   offers: consultations.chat.map((c) => ({
     '@type': 'Offer',
     name: c.name,
@@ -459,7 +459,7 @@ const serviceSchema = {
       </div>
       <p class="compare-note reveal">
         Déplacements inclus dans un rayon de {site.radiusKm} km autour de {site.base}, puis {site.kmFee}.
-        Certaines consultations sont possibles en ligne. Paiement par virement, TWINT ou espèces.
+        Consultations aussi en visioconférence, partout en Suisse et en France. Paiement par virement, TWINT ou espèces.
       </p>
     </div>
   </section>

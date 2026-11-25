@@ -202,11 +202,11 @@ export const formationsNote =
 export const faq = [
   {
     q: 'Où se déroulent les consultations ?',
-    a: 'Le plus souvent à votre domicile : c’est là que votre animal vit et que les difficultés apparaissent. Pour les chiens, une séance peut aussi avoir lieu à Genève centre ou en extérieur. Certaines consultations pour chats sont possibles en ligne.',
+    a: 'Le plus souvent à votre domicile : c’est là que votre animal vit et que les difficultés apparaissent. Pour les chiens, une séance peut aussi avoir lieu à Genève centre ou en extérieur. Pour les chats, la consultation peut aussi se faire en visioconférence, depuis toute la Suisse ou la France.',
   },
   {
     q: 'Quelle zone couvrez-vous ?',
-    a: 'Genève et ses environs. Les déplacements sont inclus dans un rayon de 15 km autour de Grand-Lancy ; au-delà, ils sont facturés CHF 0.90 par kilomètre.',
+    a: 'Pour les chiens : tout le canton de Genève, à domicile. Pour les chats : à domicile dans le canton, et en visioconférence partout en Suisse et en France. Les déplacements sont inclus dans un rayon de 15 km autour de Grand-Lancy ; au-delà, ils sont facturés CHF 0.90 par kilomètre.',
   },
   {
     q: 'Faut-il consulter un vétérinaire avant ?',
