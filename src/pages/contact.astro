@@ -107,9 +107,9 @@ const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT || (import.meta.env.PROD ?
           <fieldset class="field">
             <legend>Votre animal *</legend>
             <div class="choices">
-              <label class="choice"><input type="radio" name="animal" value="Chien" required aria-describedby="err-animal" /> <span><PawIcon animal="dog" size={18} /> Chien</span></label>
-              <label class="choice"><input type="radio" name="animal" value="Chat" /> <span><PawIcon animal="cat" size={18} /> Chat</span></label>
-              <label class="choice"><input type="radio" name="animal" value="Chien et chat" /> <span><PawIcon animal="dog" size={16} /><PawIcon animal="cat" size={16} /> Les deux</span></label>
+              <label class="choice"><input type="radio" name="animal" value="Chien" required aria-describedby="err-animal" /> <span><span class="paws"><PawIcon animal="dog" size={18} /></span> Chien</span></label>
+              <label class="choice"><input type="radio" name="animal" value="Chat" /> <span><span class="paws"><PawIcon animal="cat" size={18} /></span> Chat</span></label>
+              <label class="choice"><input type="radio" name="animal" value="Chien et chat" /> <span><span class="paws"><PawIcon animal="dog" size={16} /><PawIcon animal="cat" size={16} /></span> Les deux</span></label>
             </div>
             <p class="f-err" id="err-animal">Choisissez votre animal.</p>
           </fieldset>
@@ -139,20 +139,6 @@ const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT || (import.meta.env.PROD ?
             <label for="message">Votre message *</label>
             <textarea id="message" name="message" rows="6" required maxlength="5000" aria-describedby="err-message" placeholder="Décrivez la situation, depuis quand, ce que vous avez déjà essayé… Pour une garde : dates et nombre de visites."></textarea>
             <p class="f-err" id="err-message">Décrivez votre demande en quelques mots.</p>
-          </div>
-
-          <div class="field">
-            <label for="source">Comment m’avez-vous connue ?</label>
-            <select id="source" name="source" data-pretty>
-              <option value="">Choisir…</option>
-              <option>Recherche Google</option>
-              <option>Bouche-à-oreille / un ami</option>
-              <option>Mon vétérinaire</option>
-              <option>Un éleveur</option>
-              <option>SPA / refuge</option>
-              <option>Réseaux sociaux</option>
-              <option>Autre</option>
-            </select>
           </div>
 
           <div class="field consent-field">
@@ -209,7 +195,7 @@ const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT || (import.meta.env.PROD ?
   // ---------- Brouillon : rien n'est perdu si la page est actualisée ou fermée ----------
   // Gardé uniquement sur l'appareil du visiteur (localStorage), 7 jours au plus, effacé après l'envoi.
   const DRAFT_KEY = 'ch-contact-draft';
-  const DRAFT_FIELDS = ['nom', 'telephone', 'email', 'localite', 'animal', 'prestation', 'infos_animal', 'message', 'source', 'consentement'];
+  const DRAFT_FIELDS = ['nom', 'telephone', 'email', 'localite', 'animal', 'prestation', 'infos_animal', 'message', 'consentement'];
   const saveDraft = () => {
     try {
       const d: Record<string, string | boolean> = { _t: String(Date.now()) };
@@ -401,7 +387,6 @@ const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT || (import.meta.env.PROD ?
       `Animal : ${data.get('animal')}`,
       `Prestation : ${label}`,
       `Nom, âge, race : ${data.get('infos_animal') || '-'}`,
-      `Comment m’avez-vous connue : ${data.get('source') || '-'}`,
       `Arrivée sur le site : ${origin.landing || '-'} (via ${origin.referrer || '-'})`,
       'Envoyé depuis le site canifelinharmonie.ch',
       '',
@@ -926,7 +911,7 @@ const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT || (import.meta.env.PROD ?
     opacity: 0;
     cursor: pointer;
   }
-  .choice span {
+  .choice > span {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -942,6 +927,11 @@ const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT || (import.meta.env.PROD ?
       background-color 0.2s ease,
       color 0.2s ease,
       box-shadow 0.2s ease;
+  }
+  .paws {
+    display: inline-flex;
+    align-items: center;
+    gap: 1px;
   }
   .choice :global(svg) {
     flex: none;
@@ -961,19 +951,19 @@ const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT || (import.meta.env.PROD ?
   .choice input:focus-visible + span {
     box-shadow: 0 0 0 3px rgb(70 181 156 / 0.35);
   }
-  .choice:active span {
+  .choice:active > span {
     transform: scale(0.98);
   }
   .was-validated .choices:has(input:invalid) {
     box-shadow: inset 0 0 0 1px rgb(196 98 78 / 0.45);
   }
+  /* Téléphone : pattes au-dessus du texte, pour garder les deux pattes de « Les deux » */
   @media (max-width: 480px) {
-    .choice span {
+    .choice > span {
+      flex-direction: column;
+      gap: 3px;
+      min-height: 60px;
       font-size: 0.9rem;
-    }
-    /* « Les deux » : une seule patte pour tenir sur une ligne */
-    .choice :global(svg + svg) {
-      display: none;
     }
   }
 

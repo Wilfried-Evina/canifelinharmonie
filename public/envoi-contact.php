@@ -264,7 +264,6 @@ $animal      = line('animal', 40);
 $prestation  = line('prestation', 120);
 $infosAnimal = line('infos_animal', 160);
 $localite    = line('localite', 80);
-$source      = line('source', 80);
 $message     = text('message', 5000);
 $consent     = line('consentement', 10);
 $arrivee     = line('arrivee', 200);
@@ -290,7 +289,7 @@ $arriveeLabel = $arrivee === '' ? '' : ($pages[$slug] ?? $arrivee);
 $subject = 'Demande de rendez-vous (site) – ' . $prestation;
 $or = static fn(string $s): string => $s !== '' ? $s : '-';
 $body = implode("\n", array_merge([
-    'Demande de rendez-vous – Canifelin Harmonie',
+    'Nouvelle demande envoyée depuis le site ' . SITE,
     '',
     'Nom : ' . $nom,
     'E-mail : ' . $email,
@@ -303,7 +302,6 @@ $body = implode("\n", array_merge([
     'Message :',
     $message,
     '',
-    'Comment m’avez-vous connue : ' . $or($source),
     'Arrivée sur le site par la page : ' . $or($arriveeLabel),
 ], $campagne !== '' ? ['Campagne : ' . $campagne] : []));
 
@@ -333,7 +331,8 @@ $html = '<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="
     . '</td></tr>'
     // Carte : la demande
     . '<tr><td style="background:#ffffff;border-radius:20px;padding:32px 28px">'
-    . '<h1 style="margin:0 0 24px;font-size:22px;line-height:1.25;font-weight:600;color:#0f2c3d;text-align:center">Demande de rendez-vous</h1>'
+    . '<h1 style="margin:0 0 6px;font-size:22px;line-height:1.25;font-weight:600;color:#0f2c3d;text-align:center">Demande de rendez-vous</h1>'
+    . '<p style="margin:0 0 24px;font-size:14px;color:#566673;text-align:center">Nouvelle demande envoyée depuis le site ' . SITE . '</p>'
     . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0">'
     . $row('Nom', $h($nom))
     . $row('E-mail', '<a href="mailto:' . $h($email) . '" style="color:#2770a6;text-decoration:none">' . $h($email) . '</a>')
@@ -347,10 +346,9 @@ $html = '<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="
     . '<div style="background:#fbf5ee;border-radius:14px;padding:16px 18px;font-size:15px;line-height:1.6;color:#1a2a35">'
     . nl2br($h($message)) . '</div>'
     . '</td></tr>'
-    // Comment le client a trouvé le site (discret, sous la carte)
+    // Page par laquelle le client est arrivé sur le site (discret, sous la carte)
     . '<tr><td align="center" style="padding:18px 28px 0">'
     . '<table role="presentation" cellpadding="0" cellspacing="0">'
-    . $small('Comment m’avez-vous connue', $or($source))
     . $small('Arrivée sur le site par la page', $or($arriveeLabel))
     . ($campagne !== '' ? $small('Campagne', $campagne) : '')
     . '</table>'
