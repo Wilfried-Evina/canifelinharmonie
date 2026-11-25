@@ -1,0 +1,71 @@
+---
+// Moustaches de chat qui frémissent de temps en temps. side="left" | "right" (miroir).
+interface Props {
+  side?: 'left' | 'right';
+  class?: string;
+  size?: number;
+}
+const { side = 'left', class: cls, size = 34 } = Astro.props;
+---
+
+<svg
+  class:list={['whiskers', side, cls]}
+  width={size}
+  height={size * 0.62}
+  viewBox="0 0 40 25"
+  aria-hidden="true"
+>
+  <g class="w-group">
+    <path d="M38 9.5Q21 5.5 3 2.5" />
+    <path d="M38 12.5Q21 12 2 12.5" />
+    <path d="M38 15.5Q21 19.5 3 23" />
+  </g>
+</svg>
+
+<style>
+  .whiskers {
+    flex: none;
+    overflow: visible;
+  }
+  .right {
+    transform: scaleX(-1);
+  }
+  .w-group {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .w-group {
+      transform-box: view-box;
+      transform-origin: 38px 12.5px; /* pivot côté museau */
+      animation: twitch 4.2s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+    }
+    /* Le côté droit frémit avec un léger décalage, comme un vrai chat */
+    .right .w-group {
+      animation-delay: 0.12s;
+    }
+  }
+
+  @keyframes twitch {
+    0%,
+    62%,
+    100% {
+      transform: rotate(0deg);
+    }
+    66% {
+      transform: rotate(-7deg);
+    }
+    70% {
+      transform: rotate(3deg);
+    }
+    74% {
+      transform: rotate(-4deg);
+    }
+    79% {
+      transform: rotate(0deg);
+    }
+  }
+</style>

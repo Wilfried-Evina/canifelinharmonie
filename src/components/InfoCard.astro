@@ -1,0 +1,80 @@
+---
+import Icon from './Icon.astro';
+import PawTrail from './PawTrail.astro';
+import { site } from '../data/site';
+interface Props {
+  garde: string;
+}
+const { garde } = Astro.props;
+---
+
+<aside class="info-card reveal">
+  <h3>Infos pratiques</h3>
+  <ul>
+    <li>
+      <Icon name="pin" size={20} />
+      <span><strong>Déplacements inclus</strong> dans un rayon de {site.radiusKm} km autour de {site.base}, puis {site.kmFee}.</span>
+    </li>
+    <li>
+      <Icon name="check" size={20} />
+      <span><strong>Paiement</strong> par virement, TWINT ou espèces.</span>
+    </li>
+    <li>
+      <Icon name="clock" size={20} />
+      <span><strong>Réponse</strong> sous {site.responseTime}.</span>
+    </li>
+  </ul>
+  <a href={garde} class="link-arrow">Besoin d’une garde ? Voir les offres <Icon name="arrow" size={18} /></a>
+  <PawTrail class="ic-paws" count={3} opacity={0.22} delay={0.6} animal={garde.includes("chats") ? "cat" : "dog"} />
+</aside>
+
+<style>
+  .info-card {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 30px 28px;
+    border-radius: var(--radius);
+    background: var(--teal-900);
+    color: var(--teal-100);
+  }
+  h3 {
+    color: var(--white);
+    margin: 0;
+  }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 16px;
+    font-size: 0.96rem;
+  }
+  li {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  li :global(svg) {
+    flex: none;
+    margin-top: 2px;
+    color: var(--brand-green);
+  }
+  strong {
+    color: var(--white);
+    font-weight: 600;
+  }
+  .link-arrow {
+    margin-top: auto;
+    color: var(--white);
+  }
+  .info-card :global(.ic-paws) {
+    position: absolute;
+    right: 18px;
+    top: 18px;
+    width: 40px;
+    transform: rotate(20deg);
+  }
+</style>

@@ -1,0 +1,60 @@
+---
+import Icon from './Icon.astro';
+interface Props {
+  items: { q: string; a: string }[];
+}
+const { items } = Astro.props;
+---
+
+<div class="faq">
+  {
+    items.map((it) => (
+      <details>
+        <summary>
+          <span>{it.q}</span>
+          <Icon name="plus" size={20} />
+        </summary>
+        <p>{it.a}</p>
+      </details>
+    ))
+  }
+</div>
+
+<style>
+  .faq {
+    border-top: 1px solid var(--line);
+  }
+  details {
+    border-bottom: 1px solid var(--line);
+  }
+  summary {
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 22px 0;
+    cursor: pointer;
+    font-family: var(--font-display);
+    font-size: clamp(1.1rem, 1rem + 0.4vw, 1.3rem);
+    color: var(--teal-950);
+    -webkit-tap-highlight-color: transparent;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  summary :global(svg) {
+    flex: none;
+    color: var(--teal-600);
+    transition: transform 0.25s var(--ease);
+  }
+  details[open] summary :global(svg) {
+    transform: rotate(45deg);
+  }
+  details p {
+    color: var(--muted);
+    padding: 0 40px 22px 0;
+    margin: 0;
+    max-width: 70ch;
+  }
+</style>

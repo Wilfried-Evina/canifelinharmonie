@@ -1,0 +1,65 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+interface Props {
+  photos: [ImageMetadata, ImageMetadata];
+  captions?: [string, string];
+  tint?: 'teal' | 'warm';
+}
+const { photos, captions, tint = 'teal' } = Astro.props;
+---
+
+<div class:list={['hero-photos', tint]} aria-hidden="true">
+  {
+    photos.map((p, i) => (
+      <figure class:list={['polaroid', `hp${i + 1}`]}>
+        <Image src={p} alt="" widths={[280, 560]} sizes="280px" loading="eager" />
+        {captions && <figcaption>{captions[i]}</figcaption>}
+      </figure>
+    ))
+  }
+</div>
+
+<style>
+  .hero-photos {
+    position: relative;
+    height: 380px;
+    max-width: 520px;
+    width: 100%;
+    margin-inline: auto;
+  }
+  .hero-photos::before {
+    content: '';
+    position: absolute;
+    inset: 8% 6% 4% 10%;
+    border-radius: 55% 45% 50% 50% / 50% 55% 45% 50%;
+    background: var(--teal-100);
+  }
+  .warm::before {
+    background: var(--apricot-soft);
+  }
+  .polaroid {
+    position: absolute;
+    max-width: 290px;
+  }
+  .polaroid :global(img) {
+    aspect-ratio: 4/3;
+  }
+  .hp1 {
+    width: 60%;
+    top: 0;
+    left: 0;
+    transform: rotate(-4deg);
+  }
+  .hp2 {
+    width: 54%;
+    bottom: 0;
+    right: 0;
+    transform: rotate(4deg);
+  }
+  @media (max-width: 899px) {
+    .hero-photos {
+      height: 300px;
+    }
+  }
+</style>

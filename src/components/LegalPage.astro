@@ -1,0 +1,225 @@
+---
+// Gabarit commun des pages légales (Conditions d'utilisation, Politique de confidentialité) :
+// titre centré, sommaire collant à gauche, texte en sections séparées par des filets.
+import { site } from '../data/site';
+
+interface Props {
+  kicker?: string;
+  title: string;
+  updated: string;
+  sections: string[];
+  other: { href: string; label: string };
+}
+const { kicker = 'Informations légales', title, updated, sections, other } = Astro.props;
+---
+
+<section class="lg-hero">
+  <div class="container lg-head">
+    <p class="lg-kicker">{kicker}</p>
+    <h1 class="lg-title">{title}</h1>
+    <p class="lg-date">Dernière mise à jour{' '}: {updated}</p>
+  </div>
+</section>
+
+<section class="lg-body">
+  <div class="container lg-grid">
+    <aside class="lg-side">
+      <nav class="lg-toc" aria-label="Sommaire">
+        <p class="lg-side-title">Sommaire</p>
+        <ol>
+          {
+            sections.map((t, i) => (
+              <li>
+                <a href={`#s${i + 1}`}>{t}</a>
+              </li>
+            ))
+          }
+        </ol>
+      </nav>
+      <div class="lg-contact">
+        <p class="lg-side-title">Une question{' '}?</p>
+        <p>Pour toute question sur ces informations ou sur vos données, écrivez-moi.</p>
+        <a href={`mailto:${site.email}`} class="lg-mail">{site.email}</a>
+        <a href={other.href} class="lg-other">{other.label}</a>
+      </div>
+    </aside>
+
+    <article class="lg-prose">
+      <slot />
+    </article>
+  </div>
+</section>
+<!-- Filet fin, pleine largeur, entre le contenu et le footer (comme sous le bandeau des autres pages) -->
+<hr class="page-sep" />
+
+<style>
+  .lg-hero {
+    background: var(--cream);
+    padding-block: clamp(48px, 7vw, 104px) clamp(24px, 4vw, 48px);
+  }
+  .lg-head {
+    text-align: center;
+  }
+  .lg-kicker {
+    margin: 0 0 14px;
+    font-size: clamp(0.95rem, 0.9rem + 0.3vw, 1.15rem);
+    font-weight: 600;
+    color: var(--teal-700);
+  }
+  .lg-title {
+    margin: 0 auto 14px;
+    max-width: 16ch;
+    font-size: clamp(2.4rem, 1.4rem + 4.4vw, 5.2rem);
+    font-weight: 500;
+    letter-spacing: -0.035em;
+    line-height: 1.02;
+    text-wrap: balance;
+    background: linear-gradient(100deg, var(--teal-950) 0%, var(--teal-950) 55%, #2b84a9 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .lg-date {
+    margin: 0;
+    color: var(--muted);
+  }
+
+  .lg-body {
+    background: var(--cream);
+    padding-block: clamp(24px, 4vw, 56px) clamp(88px, 11vw, 150px);
+  }
+  .lg-grid {
+    display: grid;
+    gap: 40px;
+  }
+  @media (min-width: 1000px) {
+    .lg-grid {
+      grid-template-columns: minmax(240px, 0.32fr) minmax(0, 1fr);
+      gap: clamp(56px, 7vw, 128px);
+      align-items: start;
+    }
+    .lg-side {
+      position: sticky;
+      top: 104px;
+    }
+  }
+  /* Mobile : le sommaire est masqué (lecture directe), le contact passe après le texte */
+  @media (max-width: 999px) {
+    .lg-toc {
+      display: none;
+    }
+    .lg-side {
+      order: 2;
+      text-align: center;
+    }
+  }
+
+  .lg-side-title {
+    margin: 0 0 12px;
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    color: var(--teal-950);
+  }
+  .lg-toc ol {
+    list-style: none;
+    margin: 0 0 32px;
+    padding: 0;
+    counter-reset: t;
+    border-top: 1px solid rgb(21 61 85 / 0.1);
+  }
+  .lg-toc li {
+    counter-increment: t;
+    border-bottom: 1px solid rgb(21 61 85 / 0.1);
+  }
+  .lg-toc a {
+    display: flex;
+    gap: 12px;
+    padding: 10px 0;
+    color: var(--muted);
+    font-size: 0.93rem;
+    line-height: 1.35;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  .lg-toc a::before {
+    content: counter(t);
+    flex: none;
+    width: 1.4em;
+    font-family: var(--font-display);
+    color: var(--teal-600);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .lg-toc a:hover {
+      color: var(--teal-950);
+    }
+  }
+  .lg-contact p:not(.lg-side-title) {
+    margin: 0 0 10px;
+    color: var(--muted);
+    font-size: 0.93rem;
+    line-height: 1.5;
+  }
+  .lg-mail {
+    display: block;
+    color: var(--teal-700);
+    font-weight: 600;
+    overflow-wrap: anywhere;
+    text-decoration: none;
+  }
+  .lg-other {
+    display: inline-block;
+    margin-top: 16px;
+    color: var(--muted);
+    font-size: 0.93rem;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  /* Texte : une section par titre, séparées par un filet */
+  .lg-prose {
+    max-width: 78ch;
+    color: var(--ink);
+    font-size: clamp(1rem, 0.97rem + 0.15vw, 1.08rem);
+    line-height: 1.75;
+  }
+  .lg-prose :global(h2) {
+    scroll-margin-top: 104px;
+    margin: 0 0 14px;
+    padding-top: clamp(28px, 3vw, 40px);
+    border-top: 1px solid rgb(21 61 85 / 0.12);
+    font-size: clamp(1.35rem, 1.15rem + 0.8vw, 1.85rem);
+    font-weight: 450;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    color: var(--teal-950);
+  }
+  .lg-prose :global(h2:first-child) {
+    padding-top: 0;
+    border-top: 0;
+  }
+  .lg-prose :global(p),
+  .lg-prose :global(ul) {
+    margin: 0 0 1.1em;
+    color: #3d4c57;
+  }
+  .lg-prose :global(ul) {
+    padding-left: 1.2em;
+  }
+  .lg-prose :global(li) {
+    margin-bottom: 0.4em;
+  }
+  .lg-prose :global(li::marker) {
+    color: var(--teal-500);
+  }
+  .lg-prose :global(p:last-child) {
+    margin-bottom: clamp(28px, 3vw, 40px);
+  }
+  .lg-prose :global(a) {
+    color: var(--teal-700);
+  }
+  @media (max-width: 999px) {
+    .lg-prose {
+      max-width: none;
+    }
+  }
+</style>

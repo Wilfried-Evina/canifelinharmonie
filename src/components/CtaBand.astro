@@ -1,0 +1,126 @@
+---
+import Icon from './Icon.astro';
+import PawTrail from './PawTrail.astro';
+import { site } from '../data/site';
+interface Props {
+  title?: string;
+  text?: string;
+}
+// Traces animées : chat à gauche des boutons, chien à droite
+const {
+  title = 'Parlons de votre compagnon',
+  text = `Décrivez-moi la situation en quelques lignes : je vous réponds sous ${site.responseTime} pour convenir ensemble de la meilleure approche.`,
+} = Astro.props;
+---
+
+<section class="cta-wrap">
+  <div class="cta">
+    <div class="container cta-inner reveal">
+      <div class="cta-text">
+        <h2>{title}</h2>
+        <p>{text}</p>
+      </div>
+      <div class="btn-row">
+        <PawTrail class="cta-paws-cat" animal="cat" count={4} opacity={0.85} delay={0.2} />
+        <a href="/contact" class="btn">Prendre rendez-vous</a>
+        <a href={site.whatsapp} class="btn btn--ghost btn-wa" target="_blank" rel="noopener">
+          <Icon name="whatsapp" size={18} /> WhatsApp
+        </a>
+      </div>
+    </div>
+    <!-- fine ligne qui sépare le bloc du footer, d'un bord à l'autre de l'écran -->
+    <hr class="cta-sep" />
+    <PawTrail class="cta-paws" count={4} opacity={0.85} delay={1.2} animal="dog" />
+  </div>
+</section>
+
+<style>
+  /* Bloc remonté : pas d'espace en plus au-dessus, collé au footer en dessous */
+  .cta-wrap {
+    padding-top: 0;
+  }
+  .cta {
+    position: relative;
+    overflow: hidden;
+    /* Peu d'espace au-dessus (bloc remonté), la ligne de séparation en bas */
+    padding-top: clamp(8px, 1.5vw, 24px);
+    /* Même crème que le footer, sans ligne de séparation */
+    background: var(--cream);
+    color: var(--muted);
+  }
+  .cta-inner {
+    display: grid;
+    gap: 28px;
+    align-items: center;
+  }
+  @media (min-width: 900px) {
+    .cta-inner {
+      grid-template-columns: 1.4fr auto;
+    }
+  }
+  .cta-sep {
+    margin: clamp(40px, 5vw, 64px) 0 0;
+    border: 0;
+    border-top: 1px solid var(--line);
+  }
+  .cta-text {
+    position: relative;
+    z-index: 1;
+  }
+  .cta h2 {
+    color: var(--teal-950);
+  }
+  /* Icône WhatsApp dans son vert officiel */
+  .btn-wa :global(svg) {
+    color: #25d366;
+  }
+  .cta p {
+    max-width: 52ch;
+    margin: 0;
+  }
+  .btn-row {
+    position: relative;
+    z-index: 1;
+  }
+  /* Pattes de chat : à gauche du bouton « Prendre rendez-vous », marchent vers la gauche */
+  .btn-row :global(.cta-paws-cat) {
+    position: absolute;
+    right: calc(100% + 28px);
+    top: 50%;
+    width: 50px;
+    transform: translateY(-50%) rotate(-58deg);
+  }
+  @media (max-width: 899px) {
+    .btn-row :global(.cta-paws-cat) {
+      right: auto;
+      left: 50%;
+      top: calc(100% - 22px);
+      width: 44px;
+      transform: translateX(-50%) rotate(90deg);
+    }
+    .btn-row {
+      margin-bottom: 64px;
+    }
+  }
+  @media (max-width: 899px) {
+    .cta {
+      padding-top: 48px;
+    }
+    /* Chien : en haut à droite ; chat : sous les boutons, à gauche */
+    .cta :global(.cta-paws) {
+      width: 38px;
+      right: 14px;
+      top: -32px;
+      bottom: auto;
+      transform: rotate(30deg);
+      opacity: 0.6 !important;
+    }
+  }
+  .cta :global(.cta-paws) {
+    position: absolute;
+    right: -6px;
+    bottom: 36px;
+    width: 70px;
+    transform: rotate(38deg);
+  }
+</style>

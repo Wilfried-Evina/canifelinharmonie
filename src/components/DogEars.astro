@@ -1,0 +1,75 @@
+---
+// Oreille tombante de chien qui ballotte de temps en temps (comme un chien qui secoue la tête).
+// side="left" | "right" (miroir).
+interface Props {
+  side?: 'left' | 'right';
+  class?: string;
+  size?: number;
+}
+const { side = 'left', class: cls, size = 23 } = Astro.props;
+---
+
+<svg
+  class:list={['dog-ear', side, cls]}
+  width={size}
+  height={size * 1.92}
+  viewBox="0 0 24 46"
+  aria-hidden="true"
+>
+  <g class="ear">
+    <!-- longue oreille tombante (type beagle) : fine en haut côté tête, large et ronde en bas -->
+    <path class="shape" d="M20.5 1C12 4.5 4.5 11 2.2 20 0 28.5 2.2 39 9.5 43.6c5 2.9 11.3 1.2 12.5-4.6 1.2-6-.4-13-.4-21 0-7 1-13-1.1-17z" />
+  </g>
+</svg>
+
+<style>
+  .dog-ear {
+    flex: none;
+    overflow: visible;
+  }
+  .right {
+    transform: scaleX(-1);
+  }
+  .shape {
+    fill: currentColor;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .ear {
+      transform-box: view-box;
+      transform-origin: 20.5px 2px; /* pivot : attache de l'oreille */
+      animation: ear-flop 4.6s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+    }
+    /* L'oreille droite suit avec un léger retard : effet de balancement naturel */
+    .right .ear {
+      animation-delay: 0.08s;
+    }
+  }
+
+  /* Repos, puis l'oreille se soulève et retombe en ballottant (amorti) */
+  @keyframes ear-flop {
+    0%,
+    60%,
+    100% {
+      transform: rotate(0deg);
+    }
+    64% {
+      transform: rotate(13deg);
+    }
+    69% {
+      transform: rotate(-5deg);
+    }
+    73% {
+      transform: rotate(6deg);
+    }
+    77% {
+      transform: rotate(-2.5deg);
+    }
+    81% {
+      transform: rotate(1deg);
+    }
+    85% {
+      transform: rotate(0deg);
+    }
+  }
+</style>

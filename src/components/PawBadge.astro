@@ -1,0 +1,58 @@
+---
+// Grosse empreinte de patte en dégradé du logo, avec une icône blanche dans le coussinet.
+// Utilisation : <PawBadge><Icon name="hands-paw" /></PawBadge>
+interface Props {
+  size?: number;
+  class?: string;
+}
+const { size = 120, class: cls } = Astro.props;
+// Identifiant unique du dégradé (plusieurs badges sur la même page)
+const gid = `paw-grad-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<span class:list={['paw-badge', cls]} style={`--size:${size}px`}>
+  <svg class="paw-bg" viewBox="0 0 100 100" aria-hidden="true">
+    <defs>
+      <linearGradient id={gid} x1="1" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#46b59c" />
+        <stop offset="0.45" stop-color="#3a9db4" />
+        <stop offset="0.9" stop-color="#3185c5" />
+      </linearGradient>
+    </defs>
+    <g fill={`url(#${gid})`}>
+      <ellipse cx="21" cy="38" rx="9" ry="11.5" transform="rotate(-24 21 38)" />
+      <ellipse cx="37.5" cy="20" rx="10" ry="12.5" transform="rotate(-8 37.5 20)" />
+      <ellipse cx="62.5" cy="20" rx="10" ry="12.5" transform="rotate(8 62.5 20)" />
+      <ellipse cx="79" cy="38" rx="9" ry="11.5" transform="rotate(24 79 38)" />
+      <path d="M50 42.5c-15 0-31.5 18.5-31.5 32 0 10.5 8.6 16.6 17.8 14.6 5.2-1.1 8.7-3.2 13.7-3.2s8.5 2.1 13.7 3.2c9.2 2 17.8-4.1 17.8-14.6 0-13.5-16.5-32-31.5-32z" />
+    </g>
+  </svg>
+  <span class="paw-icon-slot"><slot /></span>
+</span>
+
+<style>
+  .paw-badge {
+    position: relative;
+    display: block;
+    width: var(--size);
+    height: var(--size);
+    margin: 0 auto 18px;
+    transition: transform 0.45s var(--ease);
+  }
+  .paw-bg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    filter: drop-shadow(0 10px 16px rgb(49 133 197 / 0.28));
+  }
+  /* L'icône est placée au centre du coussinet principal */
+  .paw-icon-slot {
+    position: absolute;
+    left: 50%;
+    top: 68%;
+    transform: translate(-50%, -50%);
+    display: grid;
+    place-items: center;
+    color: var(--white);
+  }
+</style>
