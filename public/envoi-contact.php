@@ -182,10 +182,10 @@ function send_smtp(string $to, string $replyTo, string $subject, string $body, s
                 ...$htmlPart,
                 rtrim(chunk_split(base64_encode($html), 76, "\r\n")),
                 '--' . $r,
-                'Content-Type: image/png; name="logo.png"',
+                'Content-Type: image/png',
                 'Content-Transfer-Encoding: base64',
                 'Content-ID: <' . $cid . '>',
-                'Content-Disposition: inline; filename="logo.png"',
+                'Content-Disposition: inline',
                 '',
                 rtrim(chunk_split(base64_encode($logo), 76, "\r\n")),
                 '--' . $r . '--',
@@ -295,6 +295,12 @@ $message     = text('message', 5000);
 $consent     = line('consentement', 10);
 $arrivee     = line('arrivee', 200);
 $campagne    = line('campagne', 200);
+// Le formulaire envoie « - » quand l'info est absente : on la traite comme vide
+foreach (['arrivee', 'campagne'] as $k) {
+    if ($$k === '-') {
+        $$k = '';
+    }
+}
 
 if ($nom === '' || $animal === '' || $prestation === '' || $message === '' || $consent === '') {
     reply(false, 422, 'required');
