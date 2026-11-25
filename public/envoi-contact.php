@@ -160,39 +160,16 @@ function send_smtp(string $to, string $replyTo, string $subject, string $body, s
             $text,
         ]);
     } else {
-        // Version HTML (avec logo) + version texte pour les messageries qui n'affichent pas le HTML.
+        // Version HTML + version texte pour les messageries qui n'affichent pas le HTML.
         // Le HTML est encodé en base64 : aucune ligne trop longue, aucun point en début de ligne.
+        // Pas de logo : il disparaîtrait du récapitulatif recopié quand Brigitte répond.
         $b = 'chf-' . bin2hex(random_bytes(10));
-        $htmlPart = [
+        $alt = [
             'Content-Type: text/html; charset=UTF-8',
             'Content-Transfer-Encoding: base64',
             '',
+            rtrim(chunk_split(base64_encode($html), 76, "\r\n")),
         ];
-        // Logo joint à l'e-mail (image intégrée « cid: ») : affiché même quand la messagerie
-        // bloque les images venant d'Internet. Sinon, repli sur l'adresse du site.
-        $logo = @file_get_contents(__DIR__ . '/email-logo.png');
-        if ($logo !== false && $logo !== '') {
-            $r = 'chfr-' . bin2hex(random_bytes(10));
-            $cid = 'logo@' . SITE;
-            $html = str_replace('https://' . SITE . '/email-logo.png', 'cid:' . $cid, $html);
-            $alt = [
-                'Content-Type: multipart/related; boundary="' . $r . '"',
-                '',
-                '--' . $r,
-                ...$htmlPart,
-                rtrim(chunk_split(base64_encode($html), 76, "\r\n")),
-                '--' . $r,
-                'Content-Type: image/png',
-                'Content-Transfer-Encoding: base64',
-                'Content-ID: <' . $cid . '>',
-                'Content-Disposition: inline',
-                '',
-                rtrim(chunk_split(base64_encode($logo), 76, "\r\n")),
-                '--' . $r . '--',
-            ];
-        } else {
-            $alt = [...$htmlPart, rtrim(chunk_split(base64_encode($html), 76, "\r\n"))];
-        }
         $parts = array_merge($head, [
             'Content-Type: multipart/alternative; boundary="' . $b . '"',
             '',
@@ -356,11 +333,10 @@ $html = '<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="
     . '<body style="margin:0;padding:0;background:#fbf5ee;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Helvetica,Arial,sans-serif">'
     . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#fbf5ee"><tr><td align="center" style="padding:32px 16px">'
     . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px">'
-    // En-tête : logo + nom
+    // En-tête : nom du site en texte (s'affiche partout, y compris dans les réponses)
     . '<tr><td align="center" style="padding:0 0 22px">'
-    . '<img src="https://' . SITE . '/email-logo.png" width="72" height="68" alt="" style="display:block;border:0;margin:0 auto 10px">'
-    . '<div style="font-size:15px;font-weight:600;color:#0f2c3d">Canifelin Harmonie</div>'
-    . '<div style="font-size:13px;color:#566673;margin-top:2px">Éducation et comportement chien &amp; chat · Genève</div>'
+    . '<div style="font-family:Georgia,\'Times New Roman\',serif;font-size:22px;line-height:1.2;color:#0f2c3d">Canifelin Harmonie</div>'
+    . '<div style="font-size:13px;color:#566673;margin-top:4px">Éducation et comportement chien &amp; chat · Genève</div>'
     . '</td></tr>'
     // Carte : la demande
     . '<tr><td style="background:#ffffff;border-radius:20px;padding:32px 28px">'
