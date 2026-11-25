@@ -91,10 +91,17 @@ const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT || (import.meta.env.PROD ?
             </div>
           </div>
 
-          <div class="field">
-            <label for="email">E-mail *</label>
-            <input id="email" name="email" type="email" autocomplete="email" required maxlength="160" aria-describedby="err-email" />
-            <p class="f-err" id="err-email">Indiquez une adresse e-mail valide, par exemple nom@exemple.ch.</p>
+          <div class="row-2">
+            <div class="field">
+              <label for="email">E-mail *</label>
+              <input id="email" name="email" type="email" autocomplete="email" required maxlength="160" aria-describedby="err-email" />
+              <p class="f-err" id="err-email">Indiquez une adresse e-mail valide, par exemple nom@exemple.ch.</p>
+            </div>
+            <div class="field">
+              <label for="localite">Commune ou NPA *</label>
+              <input id="localite" name="localite" type="text" autocomplete="address-level2" required maxlength="80" placeholder="Ex. 1212 Grand-Lancy" aria-describedby="err-localite" />
+              <p class="f-err" id="err-localite">Indiquez votre commune ou votre code postal.</p>
+            </div>
           </div>
 
           <fieldset class="field">
@@ -202,7 +209,7 @@ const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT || (import.meta.env.PROD ?
   // ---------- Brouillon : rien n'est perdu si la page est actualisée ou fermée ----------
   // Gardé uniquement sur l'appareil du visiteur (localStorage), 7 jours au plus, effacé après l'envoi.
   const DRAFT_KEY = 'ch-contact-draft';
-  const DRAFT_FIELDS = ['nom', 'telephone', 'email', 'animal', 'prestation', 'infos_animal', 'message', 'source', 'consentement'];
+  const DRAFT_FIELDS = ['nom', 'telephone', 'email', 'localite', 'animal', 'prestation', 'infos_animal', 'message', 'source', 'consentement'];
   const saveDraft = () => {
     try {
       const d: Record<string, string | boolean> = { _t: String(Date.now()) };
@@ -390,6 +397,7 @@ const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT || (import.meta.env.PROD ?
       `Nom : ${data.get('nom')}`,
       `E-mail : ${data.get('email')}`,
       `Téléphone : ${data.get('telephone') || '-'}`,
+      `Commune / NPA : ${data.get('localite') || '-'}`,
       `Animal : ${data.get('animal')}`,
       `Prestation : ${label}`,
       `Nom, âge, race : ${data.get('infos_animal') || '-'}`,

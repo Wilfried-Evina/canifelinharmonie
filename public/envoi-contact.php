@@ -263,13 +263,12 @@ $telephone   = line('telephone', 40);
 $animal      = line('animal', 40);
 $prestation  = line('prestation', 120);
 $infosAnimal = line('infos_animal', 160);
+$localite    = line('localite', 80);
 $source      = line('source', 80);
 $message     = text('message', 5000);
 $consent     = line('consentement', 10);
 $arrivee     = line('arrivee', 200);
-$provenance  = line('provenance', 300);
 $campagne    = line('campagne', 200);
-$page        = line('page', 200);
 
 if ($nom === '' || $animal === '' || $prestation === '' || $message === '' || $consent === '') {
     reply(false, 422, 'required');
@@ -278,43 +277,45 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     reply(false, 422, 'email');
 }
 
-// E-mail reçu par Brigitte
+// Page d'arrivée en clair (« / » → « Accueil »)
+$pages = [
+    '' => 'Accueil', 'chien' => 'Chien', 'chat' => 'Chat', 'garde-a-domicile' => 'Garde à domicile',
+    'tarifs' => 'Tarifs', 'qui-suis-je' => 'Qui suis-je', 'contact' => 'Contact', 'liens-utiles' => 'Liens utiles',
+];
+$slug = trim((string)parse_url($arrivee, PHP_URL_PATH), '/');
+$arriveeLabel = $arrivee === '' ? '' : ($pages[$slug] ?? $arrivee);
+
+// E-mail reçu par Brigitte. Il est rédigé pour pouvoir être cité tel quel dans sa réponse au client :
+// rien de technique, seulement la demande.
 $subject = 'Demande de rendez-vous (site) – ' . $prestation;
-$body = implode("\n", [
-    'Nouvelle demande envoyée depuis le site ' . SITE,
+$or = static fn(string $s): string => $s !== '' ? $s : '-';
+$body = implode("\n", array_merge([
+    'Demande de rendez-vous – Canifelin Harmonie',
     '',
     'Nom : ' . $nom,
     'E-mail : ' . $email,
-    'Téléphone : ' . ($telephone !== '' ? $telephone : '-'),
+    'Téléphone : ' . $or($telephone),
+    'Commune / NPA : ' . $or($localite),
     'Animal : ' . $animal,
     'Prestation : ' . $prestation,
-    'Nom, âge, race : ' . ($infosAnimal !== '' ? $infosAnimal : '-'),
+    'Nom, âge, race : ' . $or($infosAnimal),
     '',
     'Message :',
     $message,
     '',
-    '— Origine du contact —',
-    'Comment m’avez-vous connue : ' . ($source !== '' ? $source : '-'),
-    'Arrivée sur le site par la page : ' . ($arrivee !== '' ? $arrivee : '-'),
-    'Venu de : ' . ($provenance !== '' ? $provenance : '-'),
-    'Campagne : ' . ($campagne !== '' ? $campagne : '-'),
-    'Formulaire rempli sur : ' . ($page !== '' ? $page : '-'),
-    'Date : ' . date('d.m.Y H:i'),
-    '',
-    'Pour répondre, utilisez simplement « Répondre » : la réponse ira à ' . $email . '.',
-]);
+    'Comment m’avez-vous connue : ' . $or($source),
+    'Arrivée sur le site par la page : ' . $or($arriveeLabel),
+], $campagne !== '' ? ['Campagne : ' . $campagne] : []));
 
-// Même e-mail en HTML : logo, champs en tableau, bouton « Répondre » (styles en ligne, compatibles messageries)
+// Même e-mail en HTML, aux couleurs du site (styles en ligne, compatibles avec les messageries)
 $h = static fn(string $s): string => htmlspecialchars($s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-$or = static fn(string $s): string => $s !== '' ? $s : '-';
 $row = static fn(string $label, string $value): string =>
     '<tr><td style="padding:9px 16px 9px 0;color:#566673;font-size:14px;white-space:nowrap;vertical-align:top;border-bottom:1px solid #efe5d8">'
     . $h($label) . '</td><td style="padding:9px 0;color:#1a2a35;font-size:15px;vertical-align:top;border-bottom:1px solid #efe5d8">'
     . $value . '</td></tr>';
 $small = static fn(string $label, string $value): string =>
-    '<tr><td style="padding:4px 14px 4px 0;color:#566673;font-size:13px;white-space:nowrap;vertical-align:top">' . $h($label)
-    . '</td><td style="padding:4px 0;color:#1a2a35;font-size:13px;vertical-align:top;word-break:break-word">' . $h($value) . '</td></tr>';
-$replyHref = 'mailto:' . rawurlencode($email) . '?subject=' . rawurlencode('Re: Votre demande – ' . $prestation);
+    '<tr><td style="padding:3px 14px 3px 0;color:#566673;font-size:13px;white-space:nowrap;vertical-align:top">' . $h($label)
+    . '</td><td style="padding:3px 0;color:#1a2a35;font-size:13px;vertical-align:top;word-break:break-word">' . $h($value) . '</td></tr>';
 $telLink = $telephone !== ''
     ? '<a href="tel:' . $h(preg_replace('/[^\d+]/', '', $telephone) ?? '') . '" style="color:#2770a6;text-decoration:none">' . $h($telephone) . '</a>'
     : '-';
@@ -328,15 +329,16 @@ $html = '<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="
     . '<tr><td align="center" style="padding:0 0 22px">'
     . '<img src="https://' . SITE . '/email-logo.png" width="72" height="68" alt="Canifelin Harmonie" style="display:block;border:0;margin:0 auto 10px">'
     . '<div style="font-size:15px;font-weight:600;color:#0f2c3d">Canifelin Harmonie</div>'
+    . '<div style="font-size:13px;color:#566673;margin-top:2px">Éducation et comportement chien &amp; chat · Genève</div>'
     . '</td></tr>'
-    // Carte
+    // Carte : la demande
     . '<tr><td style="background:#ffffff;border-radius:20px;padding:32px 28px">'
-    . '<h1 style="margin:0 0 6px;font-size:22px;line-height:1.25;font-weight:600;color:#0f2c3d;text-align:center">Nouvelle demande de rendez-vous</h1>'
-    . '<p style="margin:0 0 24px;font-size:14px;color:#566673;text-align:center">Reçue via le site le ' . $h(date('d.m.Y à H:i')) . '</p>'
+    . '<h1 style="margin:0 0 24px;font-size:22px;line-height:1.25;font-weight:600;color:#0f2c3d;text-align:center">Demande de rendez-vous</h1>'
     . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0">'
     . $row('Nom', $h($nom))
     . $row('E-mail', '<a href="mailto:' . $h($email) . '" style="color:#2770a6;text-decoration:none">' . $h($email) . '</a>')
     . $row('Téléphone', $telLink)
+    . $row('Commune / NPA', $h($or($localite)))
     . $row('Animal', $h($animal))
     . $row('Prestation', $h($prestation))
     . $row('Nom, âge, race', $h($or($infosAnimal)))
@@ -344,21 +346,14 @@ $html = '<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="
     . '<p style="margin:24px 0 8px;font-size:14px;font-weight:600;color:#0f2c3d">Message</p>'
     . '<div style="background:#fbf5ee;border-radius:14px;padding:16px 18px;font-size:15px;line-height:1.6;color:#1a2a35">'
     . nl2br($h($message)) . '</div>'
-    . '<table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:28px auto 4px"><tr>'
-    . '<td style="background:#3185c5;border-radius:999px"><a href="' . $h($replyHref) . '" style="display:inline-block;padding:13px 28px;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none">Répondre à ' . $h($nom) . '</a></td>'
-    . '</tr></table>'
     . '</td></tr>'
-    // Origine du contact
-    . '<tr><td style="padding:22px 28px 0">'
-    . '<p style="margin:0 0 6px;font-size:13px;font-weight:600;color:#0f2c3d">Origine du contact</p>'
+    // Comment le client a trouvé le site (discret, sous la carte)
+    . '<tr><td align="center" style="padding:18px 28px 0">'
     . '<table role="presentation" cellpadding="0" cellspacing="0">'
     . $small('Comment m’avez-vous connue', $or($source))
-    . $small('Arrivée sur la page', $or($arrivee))
-    . $small('Venu de', $or($provenance))
-    . $small('Campagne', $or($campagne))
-    . $small('Formulaire rempli sur', $or($page))
+    . $small('Arrivée sur le site par la page', $or($arriveeLabel))
+    . ($campagne !== '' ? $small('Campagne', $campagne) : '')
     . '</table>'
-    . '<p style="margin:18px 0 0;font-size:12px;color:#8a97a1;text-align:center">Vous pouvez aussi simplement cliquer sur « Répondre » : la réponse ira à ' . $h($email) . '.</p>'
     . '</td></tr>'
     . '</table></td></tr></table></body></html>';
 
