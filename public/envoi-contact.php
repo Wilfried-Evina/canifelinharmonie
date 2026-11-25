@@ -352,7 +352,7 @@ $html = '<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="
     . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px">'
     // En-tête : logo + nom
     . '<tr><td align="center" style="padding:0 0 22px">'
-    . '<img src="https://' . SITE . '/email-logo.png" width="72" height="68" alt="Canifelin Harmonie" style="display:block;border:0;margin:0 auto 10px">'
+    . '<img src="https://' . SITE . '/email-logo.png" width="72" height="68" alt="" style="display:block;border:0;margin:0 auto 10px">'
     . '<div style="font-size:15px;font-weight:600;color:#0f2c3d">Canifelin Harmonie</div>'
     . '<div style="font-size:13px;color:#566673;margin-top:2px">Éducation et comportement chien &amp; chat · Genève</div>'
     . '</td></tr>'
