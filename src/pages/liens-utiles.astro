@@ -1,0 +1,323 @@
+---
+// Page Liens utiles – même mise en scène que les autres pages (titre géant, liste éditoriale pleine largeur).
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { usefulLinks } from '../data/site';
+
+// Une ligne par professionnel, avec sa catégorie
+const rows = usefulLinks.flatMap((g) => g.items.map((l) => ({ ...l, category: g.category })));
+---
+
+<Base
+  title="Liens utiles : vétérinaires et partenaires à Genève"
+  description="Vétérinaires comportementalistes, ostéopathes animaliers et partenaires recommandés par Canifelin Harmonie à Genève et environs."
+>
+  <section class="ch-hero l-hero" id="top">
+    <div class="container ch-hero-head">
+      <p class="ch-kicker">Liens utiles</p>
+      <h1 class="ch-title">
+        <span class="t-line">Un réseau de confiance.</span>
+        <span class="t-line grad">Pour son bien-être.</span>
+      </h1>
+      <p class="ch-sub">
+        Le bien-être d’un animal passe parfois par plusieurs spécialistes. Voici les professionnels et
+        associations que je recommande.
+      </p>
+    </div>
+  </section>
+
+  <section class="l-list-section">
+    <div class="container">
+      <ul class="l-list">
+        {
+          rows.map((l) => (
+            <li class="l-row reveal">
+              <p class="l-cat">{l.category}</p>
+              <div class="l-body">
+                <h2>{l.name.replace(/Dr /g, 'Dr\u00a0')}</h2>
+                <p>{l.note}</p>
+              </div>
+              <div class="l-action">
+                {l.href ? (
+                  <a href={l.href} target="_blank" rel="noopener" class="l-link">
+                    {new URL(l.href).hostname.replace('www.', '')}
+                    <Icon name="external" size={16} />
+                  </a>
+                ) : null}
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <CtaBand />
+</Base>
+
+<style>
+  /* ============================================================
+     Typographie « Apple »
+     ============================================================ */
+  .grad {
+    background: linear-gradient(100deg, #3185c5 10%, #3a9db4 50%, #46b59c 90%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .ch-kicker {
+    font-size: clamp(0.95rem, 0.9rem + 0.3vw, 1.15rem);
+    font-weight: 600;
+    color: var(--teal-700);
+    margin: 0 0 14px;
+  }
+  .ch-h2 {
+    font-size: clamp(2.2rem, 1.4rem + 3.4vw, 4.2rem);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 1.04;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .muted-line {
+    display: inline-block;
+    text-wrap: balance;
+    color: #8a97a3;
+  }
+  .ch-section-head {
+    margin-bottom: clamp(36px, 5vw, 64px);
+  }
+  .ch-section-head.center {
+    text-align: center;
+  }
+  .ch-center {
+    display: flex;
+    justify-content: center;
+    margin-top: clamp(40px, 5vw, 64px);
+  }
+
+  /* ============================================================
+     Hero
+     ============================================================ */
+  .ch-hero {
+    padding-top: clamp(48px, 7vw, 96px);
+    background: var(--cream);
+    overflow: hidden;
+  }
+  .ch-hero-head {
+    text-align: center;
+  }
+  .ch-title {
+    font-size: clamp(2.7rem, 1.2rem + 6vw, 6.6rem);
+    font-weight: 500;
+    letter-spacing: -0.035em;
+    line-height: 1.02;
+    margin: 0 auto 24px;
+    max-width: 22ch;
+  }
+  .t-line {
+    display: block;
+  }
+  .ch-sub {
+    font-size: clamp(1.1rem, 1rem + 0.5vw, 1.45rem);
+    color: var(--muted);
+    max-width: 40ch;
+    margin: 0 auto 32px;
+    line-height: 1.45;
+  }
+  .ch-actions {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .ch-price {
+    margin: 22px 0 0;
+    font-size: 0.95rem;
+    color: var(--muted);
+  }
+  .ch-price strong {
+    color: var(--teal-950);
+    font-weight: 600;
+  }
+  .ch-hero-media {
+    margin-top: clamp(40px, 6vw, 80px);
+    height: clamp(340px, 60vw, 860px);
+    overflow: hidden;
+    clip-path: inset(0 var(--gutter) round 28px);
+  }
+  .ch-hero-media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 45%;
+  }
+  /* Entrée en douceur du titre au chargement */
+  @media (prefers-reduced-motion: no-preference) {
+    .t-line,
+    .ch-sub,
+    .ch-actions,
+    .ch-price,
+    .ch-kicker {
+      animation: rise 0.9s var(--ease) both;
+    }
+    .ch-hero-head .ch-kicker {
+      animation-delay: 0s;
+    }
+    .t-line:nth-child(1) {
+      animation-delay: 0.08s;
+    }
+    .t-line:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    .ch-sub {
+      animation-delay: 0.32s;
+    }
+    .ch-actions {
+      animation-delay: 0.42s;
+    }
+    .ch-price {
+      animation-delay: 0.5s;
+    }
+    .ch-hero-media {
+      animation: media-in 1.2s var(--ease) 0.25s both;
+    }
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+  }
+  @keyframes media-in {
+    from {
+      opacity: 0;
+      transform: translateY(40px) scale(0.97);
+    }
+  }
+  /* L'image s'ouvre en pleine largeur au défilement (navigateurs compatibles) */
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .ch-hero-media {
+        animation:
+          media-in 1.2s var(--ease) 0.25s both,
+          media-open linear both;
+        animation-timeline: auto, scroll(root);
+        animation-range:
+          normal,
+          0px 640px;
+      }
+      .ch-hero-media :global(img) {
+        animation: media-zoom linear both;
+        animation-timeline: scroll(root);
+        animation-range: 0px 900px;
+      }
+    }
+  }
+  @keyframes media-open {
+    to {
+      clip-path: inset(0 0 round 0);
+    }
+  }
+  @keyframes media-zoom {
+    from {
+      transform: scale(1.12);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+
+
+  .l-hero {
+    padding-bottom: clamp(24px, 4vw, 56px);
+  }
+  .l-list-section {
+    background: var(--cream);
+    padding-block: clamp(24px, 4vw, 56px) clamp(88px, 11vw, 150px);
+  }
+  .l-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid rgb(21 61 85 / 0.14);
+  }
+  .l-row {
+    display: grid;
+    gap: 8px;
+    padding: clamp(24px, 3vw, 40px) 0;
+    border-bottom: 1px solid rgb(21 61 85 / 0.14);
+    text-align: center;
+    justify-items: center;
+  }
+  .l-cat {
+    margin: 0;
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--teal-700);
+    font-size: clamp(0.98rem, 0.92rem + 0.3vw, 1.15rem);
+  }
+  .l-body h2 {
+    margin: 0 0 6px;
+    font-size: clamp(1.45rem, 1.2rem + 1vw, 2.2rem);
+    font-weight: 450;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    text-wrap: balance;
+  }
+  .l-body p {
+    margin: 0 auto;
+    max-width: 60ch;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+  .l-action {
+    margin-top: 8px;
+  }
+  .l-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--white);
+    color: var(--teal-900);
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: border-color 0.2s ease, transform 0.16s ease-out;
+  }
+  .l-link:active {
+    transform: scale(0.97);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .l-link:hover {
+      border-color: var(--teal-200);
+      color: var(--teal-900);
+    }
+  }
+  .l-nolink {
+    font-size: 0.92rem;
+    color: var(--muted);
+  }
+  /* Ordinateur : catégorie | nom + description | lien, sur toute la largeur */
+  @media (min-width: 900px) {
+    .l-row {
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.8fr) minmax(0, 0.6fr);
+      align-items: center;
+      gap: clamp(24px, 4vw, 64px);
+      text-align: left;
+      justify-items: start;
+    }
+    .l-body p {
+      margin: 0;
+    }
+    .l-action {
+      margin: 0;
+      justify-self: end;
+    }
+  }
+</style>

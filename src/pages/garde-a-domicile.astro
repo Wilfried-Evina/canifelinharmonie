@@ -1,0 +1,643 @@
+---
+// Page Garde à domicile – même mise en scène que les pages Chien et Chat.
+// Fonds par paires : crème (hero + atouts), sable (offres chiens + offres chats), crème (bon à savoir + bandeau final).
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import PawIcon from '../components/PawIcon.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { garde, site, type Price } from '../data/site';
+import { photos } from '../data/photos';
+
+const perks = [
+  { title: 'Il reste chez lui', text: 'Pas de pension ni de transport : votre animal garde son territoire, ses odeurs et ses repères.' },
+  { title: 'Une professionnelle', text: 'Garde d’animaux FSIP certifiée OSAV, éducatrice canin agréée SCAV et intervenante en comportement chien et chat : une observation attentive de leur comportement.' },
+  { title: 'Des nouvelles chaque jour', text: 'Nouvelles et photos quotidiennes par e-mail ou WhatsApp, puis un bilan de garde écrit, transmissible à votre vétérinaire.' },
+];
+
+// Chats : les prestations communes aux 3 offres sont listées une seule fois sous les colonnes
+const catShared = garde.chats[0].features;
+const catOnly = (p: Price) => p.features.filter((f) => !catShared.includes(f));
+
+const offers = [
+  {
+    id: 'chiens',
+    animal: 'dog' as const,
+    title: 'Pour les chiens.',
+    sub: 'Promenades et visites.',
+    lead: 'Une sortie pendant vos heures de travail ou plusieurs visites par jour pendant une absence : la garde s’adapte aux besoins de votre chien.',
+    items: garde.chiens.map((p) => ({ ...p, list: p.features })),
+  },
+  {
+    id: 'chats',
+    animal: 'cat' as const,
+    title: 'Pour les chats.',
+    sub: 'Visites à domicile.',
+    lead: 'Les chats sont des animaux d’habitudes qui supportent difficilement les changements d’environnement. Week-end, vacances ou hospitalisation : vos chats restent chez eux.',
+    items: garde.chats.map((p) => ({ ...p, list: catOnly(p) })),
+    shared: catShared,
+  },
+];
+
+const tips = [
+  // tiret et espaces insécables : « Au-delà » et « CHF 0.90 / km » ne se coupent jamais
+  { title: `${site.radiusKm} km inclus`, text: `Autour de ${site.base}. Au‑delà : ${site.kmFee.replace(/ /g, ' ')}.` },
+  { title: 'Une rencontre', text: 'Pour faire connaissance avec votre animal et noter ses habitudes.' },
+  { title: 'Réservez tôt', text: 'Surtout pour les périodes de vacances scolaires.' },
+  { title: 'Paiement', text: 'Par virement, TWINT ou espèces.' },
+  { title: 'Votre catsitter', text: 'Je peux aussi l’accompagner et le former à la prise en charge de vos chats.' },
+];
+
+const gardeSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  '@id': `${site.url}/garde-a-domicile#service`,
+  name: 'Garde de chat et de chien à domicile et promenades à Genève',
+  serviceType: 'Garde d’animaux à domicile (cat-sitting, dog-sitting et promenades)',
+  description:
+    'Visites à domicile pour chats et promenades ou visites pour chiens à Genève et dans un rayon de 15 km autour de Grand-Lancy, par une professionnelle certifiée OSAV et agréée SCAV.',
+  provider: { '@id': `${site.url}/#business` },
+  areaServed: ['Genève', 'Grand-Lancy', 'Lancy', 'Carouge', 'Onex', 'Plan-les-Ouates', 'Bernex', 'Confignon', 'Veyrier', 'Vernier'],
+  offers: [
+    ...garde.chiens.map((p) => ({
+      '@type': 'Offer',
+      name: `Garde chien – ${p.name} (${p.duration})`,
+      price: p.price,
+      priceCurrency: 'CHF',
+      url: `${site.url}/garde-a-domicile#chiens`,
+    })),
+    ...garde.chats.map((p) => ({
+      '@type': 'Offer',
+      name: `Garde chat – ${p.name} (${p.duration})`,
+      price: p.price,
+      priceCurrency: 'CHF',
+      url: `${site.url}/garde-a-domicile#chats`,
+    })),
+  ],
+};
+---
+
+<Base
+  title="Garde chat et chien à domicile à Genève (visites & promenades)"
+  description="Garde de chat et de chien à domicile à Genève (Grand-Lancy, Carouge, Onex et environs) : visites quotidiennes, cat-sitting, promenades de chien et nouvelles chaque jour. Dès CHF 30, par une professionnelle certifiée OSAV."
+  image={photos.entente}
+  imageAlt="Un chien et un chat couchés ensemble à la maison – Garde à domicile Genève"
+  schema={[gardeSchema]}
+>
+  <!-- ================= HERO ================= -->
+  <section class="ch-hero" id="top">
+    <div class="container ch-hero-head">
+      <p class="ch-kicker">Garde à domicile, chiens et chats</p>
+      <h1 class="ch-title">
+        <span class="t-line">Partez l’esprit léger.</span>
+        <span class="t-line grad">Il reste chez lui.</span>
+      </h1>
+      <p class="ch-sub">
+        Je prends soin de vos compagnons comme s’ils étaient les miens. Chaque garde est adaptée à leurs
+        besoins et à leur caractère, dans le confort de chez eux.
+      </p>
+      <div class="ch-actions btn-row">
+        <a href="/contact?prestation=garde" class="btn">Réserver une garde</a>
+        <a href="#offres" class="btn btn--ghost">Voir les offres</a>
+      </div>
+      <p class="ch-price">Chiens dès <strong>CHF 30</strong> · Chats dès <strong>CHF 35</strong></p>
+    </div>
+
+    <div class="ch-hero-media">
+      <Image
+        src={photos.entente}
+        alt="Un chien et un chat couchés l’un contre l’autre sur un tapis rayé, à la maison"
+        widths={[800, 1400, 2000, 2600]}
+        sizes="100vw"
+        loading="eager"
+        fetchpriority="high"
+        style="object-position:45% 55%"
+      />
+    </div>
+  </section>
+
+  <!-- ================= ATOUTS ================= -->
+  <section class="g-perks">
+    <div class="container">
+      <div class="ch-section-head center reveal">
+        <h2 class="ch-h2">Ses repères restent intacts.<br /><span class="muted-line">Vous partez sereinement.</span></h2>
+      </div>
+      <ul class="perks">
+        {
+          perks.map((p) => (
+            <li class="perk reveal">
+              <h3>{p.title}</h3>
+              <p>{p.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================= OFFRES ================= -->
+  <div id="offres">
+    {
+      offers.map((o, k) => (
+        <section class:list={['g-offers', { 'pair-next': k > 0 }]} id={o.id}>
+          <div class="container">
+            <div class="ch-section-head center reveal">
+              <h2 class="ch-h2">{o.title}<br /><span class="muted-line">{o.sub}</span></h2>
+              <p class="g-lead">{o.lead}</p>
+            </div>
+            <div class="compare">
+              {o.items.map((p) => (
+                <article class="compare-col reveal">
+                  <span class="compare-icon">
+                    <PawIcon animal={o.animal} size={34} color="#3185c5" />
+                  </span>
+                  <h3>{p.name}</h3>
+                  <p class="compare-duration">{p.duration}</p>
+                  <p class="compare-price">CHF {p.price}</p>
+                  <p class="g-unit">{p.unit}{p.extra && <span class="g-extra">{p.extra}</span>}</p>
+                  {p.list.length > 0 && (
+                    <ul>
+                      {p.list.map((f) => (
+                        <li>{f}</li>
+                      ))}
+                    </ul>
+                  )}
+                  {p.note && <p class="g-note">{p.note}</p>}
+                  <a href={`/contact?prestation=garde&animal=${o.animal === 'dog' ? 'chien' : 'chat'}`} class="btn">Réserver</a>
+                </article>
+              ))}
+            </div>
+            {o.shared && (
+              <div class="g-shared reveal">
+                <p class="g-shared-title">Inclus dans chaque visite</p>
+                <ul>
+                  {o.shared.map((f) => (
+                    <li>
+                      <PawIcon animal="cat" size={16} color="#3a9db4" />
+                      <span>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </section>
+      ))
+    }
+  </div>
+
+  <!-- ================= BON À SAVOIR ================= -->
+  <section class="g-tips">
+    <div class="container">
+      <div class="ch-section-head center reveal">
+        <h2 class="ch-h2">Bon à savoir.</h2>
+      </div>
+      <ul class="tips">
+        {
+          tips.map((t) => (
+            <li class="tip reveal">
+              <h3>{t.title}</h3>
+              <p>{t.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <CtaBand
+    title="Réservez la garde de votre compagnon"
+    text="Indiquez-moi les dates, le nombre d’animaux et leurs habitudes : je vous confirme mes disponibilités rapidement."
+  />
+</Base>
+
+<style>
+  /* ============================================================
+     Typographie « Apple »
+     ============================================================ */
+  .grad {
+    background: linear-gradient(100deg, #3185c5 10%, #3a9db4 50%, #46b59c 90%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .ch-kicker {
+    font-size: clamp(0.95rem, 0.9rem + 0.3vw, 1.15rem);
+    font-weight: 600;
+    color: var(--teal-700);
+    margin: 0 0 14px;
+  }
+  .ch-h2 {
+    font-size: clamp(2.2rem, 1.4rem + 3.4vw, 4.2rem);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 1.04;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .muted-line {
+    display: inline-block;
+    text-wrap: balance;
+    color: #8a97a3;
+  }
+  .ch-section-head {
+    margin-bottom: clamp(36px, 5vw, 64px);
+  }
+  .ch-section-head.center {
+    text-align: center;
+  }
+  .ch-center {
+    display: flex;
+    justify-content: center;
+    margin-top: clamp(40px, 5vw, 64px);
+  }
+
+  /* ============================================================
+     Hero
+     ============================================================ */
+  .ch-hero {
+    padding-top: clamp(48px, 7vw, 96px);
+    background: var(--cream);
+    overflow: hidden;
+  }
+  .ch-hero-head {
+    text-align: center;
+  }
+  .ch-title {
+    font-size: clamp(2.7rem, 1.2rem + 6vw, 6.6rem);
+    font-weight: 500;
+    letter-spacing: -0.035em;
+    line-height: 1.02;
+    margin: 0 auto 24px;
+    max-width: 22ch;
+  }
+  .t-line {
+    display: block;
+  }
+  .ch-sub {
+    font-size: clamp(1.1rem, 1rem + 0.5vw, 1.45rem);
+    color: var(--muted);
+    max-width: 40ch;
+    margin: 0 auto 32px;
+    line-height: 1.45;
+  }
+  .ch-actions {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .ch-price {
+    margin: 22px 0 0;
+    font-size: 0.95rem;
+    color: var(--muted);
+  }
+  .ch-price strong {
+    color: var(--teal-950);
+    font-weight: 600;
+  }
+  .ch-hero-media {
+    margin-top: clamp(40px, 6vw, 80px);
+    height: clamp(340px, 60vw, 860px);
+    overflow: hidden;
+    clip-path: inset(0 var(--gutter) round 28px);
+  }
+  .ch-hero-media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 45%;
+  }
+  /* Entrée en douceur du titre au chargement */
+  @media (prefers-reduced-motion: no-preference) {
+    .t-line,
+    .ch-sub,
+    .ch-actions,
+    .ch-price,
+    .ch-kicker {
+      animation: rise 0.9s var(--ease) both;
+    }
+    .ch-hero-head .ch-kicker {
+      animation-delay: 0s;
+    }
+    .t-line:nth-child(1) {
+      animation-delay: 0.08s;
+    }
+    .t-line:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    .ch-sub {
+      animation-delay: 0.32s;
+    }
+    .ch-actions {
+      animation-delay: 0.42s;
+    }
+    .ch-price {
+      animation-delay: 0.5s;
+    }
+    .ch-hero-media {
+      animation: media-in 1.2s var(--ease) 0.25s both;
+    }
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+  }
+  @keyframes media-in {
+    from {
+      opacity: 0;
+      transform: translateY(40px) scale(0.97);
+    }
+  }
+  /* L'image s'ouvre en pleine largeur au défilement (navigateurs compatibles) */
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .ch-hero-media {
+        animation:
+          media-in 1.2s var(--ease) 0.25s both,
+          media-open linear both;
+        animation-timeline: auto, scroll(root);
+        animation-range:
+          normal,
+          0px 640px;
+      }
+      .ch-hero-media :global(img) {
+        animation: media-zoom linear both;
+        animation-timeline: scroll(root);
+        animation-range: 0px 900px;
+      }
+    }
+  }
+  @keyframes media-open {
+    to {
+      clip-path: inset(0 0 round 0);
+    }
+  }
+  @keyframes media-zoom {
+    from {
+      transform: scale(1.12);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+
+
+  /* ============================================================
+     Titres de section (mêmes règles que les pages Chien et Chat)
+     ============================================================ */
+  .ch-section-head {
+    margin-bottom: clamp(36px, 5vw, 64px);
+  }
+  .ch-section-head.center {
+    text-align: center;
+  }
+
+  /* ============================================================
+     Atouts : 3 colonnes séparées par des filets (fond crème, avec le hero)
+     ============================================================ */
+  .g-perks {
+    background: var(--cream);
+    padding-block: clamp(72px, 9vw, 128px) clamp(88px, 11vw, 150px);
+  }
+  .perks {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    border-top: 1px solid rgb(21 61 85 / 0.12);
+  }
+  .perk {
+    padding: 28px 8px;
+    text-align: center;
+  }
+  .perk + .perk {
+    border-top: 1px solid rgb(21 61 85 / 0.12);
+  }
+  .perk h3 {
+    margin: 0 0 10px;
+    font-size: clamp(1.35rem, 1.15rem + 0.8vw, 1.9rem);
+    font-weight: 450;
+    letter-spacing: -0.02em;
+  }
+  .perk p {
+    margin: 0 auto;
+    max-width: 36ch;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  @media (min-width: 900px) {
+    .perks {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .perk {
+      padding: clamp(32px, 3.4vw, 48px) clamp(16px, 2vw, 36px) 0;
+    }
+    .perk + .perk {
+      border-top: 0;
+      border-left: 1px solid rgb(21 61 85 / 0.12);
+    }
+  }
+
+  /* ============================================================
+     Offres : chiens puis chats (paire sable)
+     ============================================================ */
+  .g-offers {
+    background: var(--sand);
+    padding-block: clamp(88px, 11vw, 150px) clamp(56px, 7vw, 96px);
+  }
+  .g-offers.pair-next {
+    padding-block: clamp(24px, 4vw, 56px) clamp(88px, 11vw, 150px);
+  }
+  .g-lead {
+    margin: 20px auto 0;
+    max-width: 56ch;
+    color: var(--muted);
+    font-size: clamp(1.03rem, 0.98rem + 0.26vw, 1.18rem);
+    line-height: 1.6;
+    text-wrap: pretty;
+  }
+  .compare {
+    display: grid;
+    gap: 0;
+  }
+  @media (min-width: 900px) {
+    .compare {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .compare-col + .compare-col {
+      border-left: 1px solid var(--line);
+    }
+  }
+  .compare-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 36px clamp(20px, 3vw, 44px);
+  }
+  @media (max-width: 899px) {
+    .compare-col + .compare-col {
+      border-top: 1px solid var(--line);
+    }
+  }
+  .compare-icon {
+    display: grid;
+    place-items: center;
+    height: 48px;
+    color: var(--teal-600);
+    margin-bottom: 18px;
+  }
+  .compare-col h3 {
+    font-size: clamp(1.4rem, 1.2rem + 0.6vw, 1.8rem);
+    margin: 0 0 6px;
+  }
+  .compare-duration {
+    color: var(--muted);
+    margin: 0 0 18px;
+  }
+  .compare-price {
+    font-family: var(--font-display);
+    font-size: clamp(2.2rem, 1.6rem + 2vw, 3.2rem);
+    letter-spacing: -0.03em;
+    color: var(--teal-950);
+    margin: 0 0 24px;
+    line-height: 1;
+  }
+  .compare-col ul {
+    list-style: none;
+    margin: 0 0 32px;
+    padding: 0;
+    display: grid;
+    gap: 14px;
+    color: var(--muted);
+    max-width: 30ch;
+  }
+  .compare-col ul li + li {
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+  }
+  .compare-col .btn {
+    margin-top: auto;
+  }
+  .compare-note {
+    margin: 40px auto 0;
+    max-width: 60ch;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.92rem;
+  }
+  .compare-price {
+    margin-bottom: 8px;
+  }
+  .g-unit {
+    margin: 0 0 24px;
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+  .g-extra {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.88rem;
+  }
+  .g-note {
+    margin: -8px 0 28px;
+    max-width: 30ch;
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--teal-700);
+    line-height: 1.45;
+  }
+  /* Ce qui est inclus pour les chats, une seule fois sous les 3 offres */
+  .g-shared {
+    margin: clamp(32px, 4vw, 48px) 0 0;
+    text-align: center;
+  }
+  .g-shared-title {
+    margin: 0 0 16px;
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    color: var(--teal-950);
+  }
+  .g-shared ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+  .g-shared li {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px 10px 14px;
+    border-radius: 999px;
+    background: var(--white);
+    border: 1px solid rgb(21 61 85 / 0.08);
+    color: var(--teal-950);
+    font-size: 0.95rem;
+    line-height: 1.3;
+    text-align: left;
+  }
+  .g-shared :global(svg) {
+    flex: none;
+  }
+
+  /* ============================================================
+     Bon à savoir (crème, avec le bandeau final)
+     ============================================================ */
+  .g-tips {
+    background: var(--cream);
+    padding-block: clamp(88px, 11vw, 150px) clamp(56px, 7vw, 96px);
+  }
+  /* 5 repères comme les atouts : colonnes séparées par des filets (empilés sur mobile) */
+  .tips {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    border-top: 1px solid rgb(21 61 85 / 0.12);
+  }
+  .tip {
+    padding: 24px 8px;
+    text-align: center;
+  }
+  .tip + .tip {
+    border-top: 1px solid rgb(21 61 85 / 0.12);
+  }
+  .tip h3 {
+    margin: 0 0 8px;
+    white-space: nowrap;
+    font-size: clamp(1.2rem, 1.05rem + 0.45vw, 1.45rem);
+    font-weight: 450;
+    letter-spacing: -0.02em;
+  }
+  .tip p {
+    margin: 0 auto;
+    max-width: 26ch;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+  @media (min-width: 1000px) {
+    .tips {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+    .tip {
+      padding: clamp(28px, 3vw, 44px) clamp(12px, 1.4vw, 24px) 0;
+    }
+    .tip + .tip {
+      border-top: 0;
+      border-left: 1px solid rgb(21 61 85 / 0.12);
+    }
+  }
+
+  /* Mobile : hero et titres centrés */
+  @media (max-width: 600px) {
+    .ch-hero-media {
+      clip-path: inset(0 var(--gutter) round 22px);
+    }
+  }
+</style>

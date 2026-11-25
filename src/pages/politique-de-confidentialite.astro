@@ -1,0 +1,124 @@
+---
+import Base from '../layouts/Base.astro';
+import LegalPage from '../components/LegalPage.astro';
+import { site } from '../data/site';
+---
+
+<Base
+  title="Politique de confidentialité"
+  description="Comment Canifelin Harmonie collecte, utilise et protège vos données personnelles, conformément à la loi fédérale sur la protection des données (nLPD)."
+>
+  <LegalPage
+    title="Politique de confidentialité"
+    updated="25 novembre 2026"
+    sections={['Responsable du traitement', 'Données collectées', 'Finalités', 'Outils utilisés', 'Cookies et statistiques', 'Durée de conservation', 'Partage des données', 'Vos droits', 'Modifications']}
+    other={{ href: '/conditions-d-utilisation', label: 'Conditions d’utilisation' }}
+  >
+
+        <p>
+          La protection de vos données me tient à cœur. Cette politique explique quelles données sont
+          collectées, pourquoi et comment, conformément à la loi fédérale suisse sur la protection des
+          données (nLPD) et, pour les personnes résidant dans l’Union européenne (par exemple en France
+          voisine), au règlement général sur la protection des données (RGPD).
+        </p>
+
+        <h2 id="s1">1. Responsable du traitement</h2>
+        <p>
+          {site.owner}, raison individuelle « {site.name} », {site.address} (Suisse).<br />
+          E-mail : <a href={`mailto:${site.email}`}>{site.email}</a>
+        </p>
+
+        <h2 id="s2">2. Données collectées</h2>
+        <ul>
+          <li>Données d’identification et de contact : nom, prénom, e-mail, téléphone, adresse (pour les visites à domicile).</li>
+          <li>Informations sur votre animal : nom, âge, race, santé, comportement, habitudes.</li>
+          <li>Contenu de vos messages et échanges.</li>
+          <li>
+            Lorsque vous envoyez le formulaire de contact : la page par laquelle vous êtes arrivé·e sur le
+            site, le site d’où vous venez et, le cas échéant, la campagne (paramètres « utm »). Ces
+            informations servent uniquement à savoir comment vous avez connu mes services ; elles ne
+            sont pas conservées sur votre appareil au-delà de votre visite.
+          </li>
+          <li>Données de facturation et de paiement.</li>
+          <li>
+            Données techniques de connexion : comme tout site, l’hébergeur enregistre automatiquement
+            l’adresse IP, la date et l’heure, la page consultée et le type de navigateur, pour assurer
+            le bon fonctionnement et la sécurité du site. Ces journaux sont conservés par l’hébergeur
+            pendant une durée limitée. Pour bloquer les envois abusifs du formulaire, une empreinte
+            pseudonymisée de l’adresse IP (jamais l’adresse elle-même) est gardée au plus une heure, puis
+            effacée.
+          </li>
+        </ul>
+
+        <h2 id="s3">3. Finalités</h2>
+        <ul>
+          <li>Répondre à vos demandes et organiser les rendez-vous.</li>
+          <li>Réaliser les prestations (consultations, comptes rendus, suivi, garde).</li>
+          <li>Transmettre, avec votre accord, un compte rendu à votre vétérinaire.</li>
+          <li>Facturation et obligations légales (comptabilité).</li>
+          <li>Sécurité et bon fonctionnement du site.</li>
+        </ul>
+        <p>
+          Pour les personnes soumises au RGPD, ces traitements reposent sur : les mesures
+          précontractuelles et l’exécution du contrat (demandes, rendez-vous, prestations), votre
+          consentement (formulaire de contact, transmission à votre vétérinaire), les obligations
+          légales (comptabilité) et l’intérêt légitime (sécurité du site, lutte contre le spam).
+        </p>
+
+        <h2 id="s4">4. Outils utilisés</h2>
+        <p>Pour communiquer et organiser les prestations, les services suivants peuvent être utilisés :</p>
+        <ul>
+          <li>Hébergement du site et envoi du formulaire de contact : Infomaniak (Suisse) – <a href="https://www.infomaniak.com/fr/cgv/politique-de-confidentialite" target="_blank" rel="noopener">politique de confidentialité</a></li>
+          <li>Messagerie électronique, pour répondre à vos demandes et échanger avec vous</li>
+          <li>WhatsApp (Meta) – <a href="https://www.whatsapp.com/legal/privacy-policy-eea?lang=fr" target="_blank" rel="noopener">politique de confidentialité</a></li>
+        </ul>
+        <p>
+          Certains de ces prestataires (par exemple Meta pour WhatsApp) peuvent traiter des données hors de
+          Suisse, notamment aux États-Unis. Ces transferts s’appuient sur le cadre de protection des
+          données Suisse–États-Unis et UE–États-Unis (Data Privacy Framework) pour les entreprises
+          certifiées, ou à défaut sur les clauses contractuelles types reconnues par le Préposé
+          fédéral à la protection des données et à la transparence et par la Commission européenne.
+          L’hébergement du site et l’envoi du formulaire restent en Suisse (Infomaniak).
+        </p>
+
+        <h2 id="s5">5. Cookies et statistiques</h2>
+        <p>
+          Ce site n’utilise aucun cookie, ni publicitaire ni de mesure d’audience. Seule la page
+          d’arrivée sur le site est mémorisée le temps de votre visite (stockage de session du
+          navigateur, effacé à la fermeture de l’onglet), pour être jointe à votre demande si vous
+          envoyez le formulaire. Pour que vous ne perdiez pas votre texte, le formulaire de contact
+          est aussi enregistré en brouillon sur votre appareil uniquement : il est effacé dès l’envoi
+          de la demande, et au plus tard après 7 jours. Les polices de caractères
+          sont hébergées sur le site lui-même : aucune donnée n’est transmise à des tiers lors de votre
+          visite.
+        </p>
+
+        <h2 id="s6">6. Durée de conservation</h2>
+        <ul>
+          <li>Demandes sans suite : 3 ans après le dernier contact.</li>
+          <li>Dossiers de prestation et facturation : 10 ans, conformément aux obligations légales.</li>
+        </ul>
+
+        <h2 id="s7">7. Partage des données</h2>
+        <p>
+          Vos données ne sont jamais vendues ni cédées. Elles ne sont transmises à un tiers (par
+          exemple votre vétérinaire) qu’avec votre accord, ou si la loi l’exige.
+        </p>
+
+        <h2 id="s8">8. Vos droits</h2>
+        <p>
+          Vous pouvez à tout moment demander l’accès à vos données, leur rectification ou leur
+          suppression, ou vous opposer à leur traitement, en écrivant à <a href={`mailto:${site.email}`}>{site.email}</a>. Si vous résidez dans l’Union européenne,
+          vous disposez aussi du droit à la limitation du traitement et à la portabilité de vos données,
+          et vous pouvez retirer votre consentement à tout moment. Je réponds dans un délai de 30 jours.
+        </p>
+        <p>
+          En cas de désaccord, vous pouvez vous adresser au Préposé fédéral à la protection des données
+          et à la transparence (<a href="https://www.edoeb.admin.ch/fr" target="_blank" rel="noopener">PFPDT</a>) ou, si vous résidez en France, à la
+          Commission nationale de l’informatique et des libertés (<a href="https://www.cnil.fr" target="_blank" rel="noopener">CNIL</a>).
+        </p>
+
+        <h2 id="s9">9. Modifications</h2>
+        <p>Cette politique peut être mise à jour. La date de dernière modification figure en haut de page.</p>
+  </LegalPage>
+</Base>

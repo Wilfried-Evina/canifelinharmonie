@@ -1,0 +1,40 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+---
+
+<Base title="Page introuvable" description="Cette page n’existe pas ou a été déplacée." noindex={true}>
+  <section class="section nf">
+    <div class="container narrow">
+      <Icon name="paw" size={56} class="nf-icon" />
+      <p class="eyebrow">Erreur 404</p>
+      <h1>Cette piste ne mène nulle part…</h1>
+      <p class="lead">Même le meilleur flair se trompe parfois. La page que vous cherchez n’existe pas ou a été déplacée.</p>
+      <div class="btn-row">
+        <a href="/" class="btn">Retour à l’accueil <Icon name="arrow" size={18} /></a>
+        <a href="/contact" class="btn btn--ghost">Me contacter</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .nf {
+    text-align: center;
+    min-height: 60vh;
+    display: grid;
+    align-items: center;
+  }
+  .nf :global(.nf-icon) {
+    margin: 0 auto 24px;
+    color: var(--teal-500);
+    transform: rotate(-15deg);
+  }
+  .nf .lead {
+    margin-inline: auto;
+  }
+  .nf .btn-row {
+    justify-content: center;
+    margin-top: 28px;
+  }
+</style>

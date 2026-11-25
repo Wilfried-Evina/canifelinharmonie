@@ -1,0 +1,1978 @@
+---
+// Page Chat – même mise en scène que la page Chien (inspirée des pages produit Apple) :
+// hero géant, galerie « points forts », repères, prestations avec photo fixe, signaux,
+// soins coopératifs, étapes, comparatif de tarifs, bandeau photo défilant.
+// Fonds par paires : crème (hero + points forts), sable (repères + prestations),
+// rose poudré (signaux + soins), crème (étapes + tarifs), sable (raisons + galerie).
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import PawIcon from '../components/PawIcon.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { consultations, site } from '../data/site';
+import { catPhotos, photos } from '../data/photos';
+
+// Textes : « Textes Pages Web – Version Corrigée » (Brigitte, nov. 2026)
+const highlights = [
+  {
+    photo: photos.maineCoonCabane,
+    alt: 'Maine Coon roux et blanc assis bien droit devant sa cabane d’extérieur',
+    label: 'Comportement',
+    title: 'Comprendre ses signaux.',
+    text: 'Élimination hors litière, conflits, peurs : des signaux, jamais des caprices.',
+    pos: '50% 30%',
+  },
+  {
+    photo: photos.praline,
+    alt: 'Praline et Vanille, deux chatonnes tricolores sur un canapé',
+    label: 'Éducation',
+    title: 'De bonnes habitudes, dès son arrivée.',
+    text: 'Du chaton au chat vieillissant, dans le respect de ses besoins.',
+    pos: '50% 45%',
+  },
+  {
+    photo: photos.tunnel,
+    alt: 'Deux chats jouent avec un tunnel en tissu sur un parquet',
+    label: 'Enrichissement',
+    title: 'Un quotidien plus riche.',
+    text: 'Jeux, cachettes, tapis de fouille : un environnement adapté à ses besoins.',
+    pos: '50% 55%',
+  },
+  {
+    photo: photos.namakDiablotineOlympea,
+    alt: 'Namak, Léonberg, à côté de Diablotine et Olympea installées sur leur arbre à chat',
+    label: 'Nouvel animal',
+    title: 'Bien accueillir un nouveau compagnon.',
+    text: 'Chat ou chien : une introduction préparée, idéalement avant son arrivée.',
+    pos: '50% 50%',
+  },
+  {
+    photo: photos.chatsTerrasse,
+    alt: 'Plusieurs chats installés sur leurs coussins dans une véranda',
+    label: 'Garde à domicile',
+    title: 'Votre chat reste chez lui.',
+    text: 'Pendant votre absence, une professionnelle formée prend le relais à domicile.',
+    pos: '50% 50%',
+  },
+];
+
+// Repères affichés en grand sous « Un compagnon unique »
+const proofs = [
+  { value: '1 h 30', label: 'pour la consultation complète, chez vous, là où votre chat vit' },
+  { value: '15 jours', label: 'après la consultation, un appel de suivi inclus' },
+  { value: '48 h', label: 'ouvrables au maximum pour vous répondre' },
+  { value: '2020', label: 'formée intervenante en comportement félin (Educhateur, Québec)' },
+];
+
+// Prestations, dans l'ordre de la vie du chat (photo affichée à côté de chaque texte)
+const services = [
+  {
+    name: 'Éducation',
+    title: 'De bonnes habitudes dès son arrivée.',
+    text: 'Du chaton au chat vieillissant, je vous aide à instaurer de bonnes habitudes dès son arrivée, dans le respect de vos besoins et de son bien-être.',
+    img: photos.praline,
+    alt: 'Praline et Vanille, deux chatonnes tricolores sur un canapé',
+    pos: '50% 45%',
+  },
+  {
+    name: 'Introduction d’un nouvel animal',
+    title: 'Une cohabitation préparée.',
+    text: 'L’arrivée d’un nouveau compagnon, chat ou chien, se prépare. Je vous accompagne pour planifier, organiser et sécuriser cette étape, idéalement avant son arrivée.',
+    img: photos.entente,
+    alt: 'Un chien et un chat couchés l’un contre l’autre sur un tapis',
+    pos: '40% 50%',
+  },
+  {
+    name: 'Arrivée d’un bébé',
+    title: 'Préserver l’équilibre du foyer.',
+    text: 'Préparez sereinement l’arrivée d’un enfant. Je vous aide à adapter l’environnement et à accompagner votre chat afin de faciliter cette transition.',
+    img: photos.olympeaDiablotine,
+    alt: 'Olympea, Maine Coon argenté, et Diablotine, chatte tricolore, détendues sur un lit',
+    pos: '50% 50%',
+  },
+  {
+    name: 'Comportement',
+    title: 'Comprendre avant d’agir.',
+    text: 'Élimination hors litière, conflits, miaulements nocturnes, peurs… Une consultation à domicile pour comprendre l’origine du problème et y remédier en douceur.',
+    img: photos.chatTigre,
+    alt: 'Gros plan sur un chat tigré à poil long aux yeux verts',
+    pos: '50% 35%',
+    link: { href: '#signaux', label: 'Voir les situations' },
+  },
+  {
+    name: 'Soins coopératifs',
+    title: 'Des soins sans stress.',
+    text: 'Brossage, coupe des griffes, caisse de transport, visites vétérinaires ou prise de médicaments : votre chat apprend à les accepter, à son rythme.',
+    img: photos.macha,
+    alt: 'Macha, chatte tigrée grise, détendue sur une serviette',
+    pos: '50% 40%',
+    link: { href: '#soins-cooperatifs', label: 'Voir en images' },
+  },
+  {
+    name: 'Garde à domicile',
+    title: 'Chez lui, même en votre absence.',
+    text: 'Les chats supportent difficilement les changements d’environnement. Pendant un week-end, des vacances ou une hospitalisation, vos chats restent chez eux, pris en charge par une professionnelle formée.',
+    img: photos.chatsTerrasse,
+    alt: 'Plusieurs chats installés sur leurs coussins dans une véranda',
+    pos: '50% 50%',
+    link: { href: '/garde-a-domicile#chats', label: 'Voir les offres' },
+  },
+];
+
+// Situations pour lesquelles Brigitte intervient
+const problems = [
+  'Élimination hors litière',
+  'Agressions ou conflits : chat/chat, chat/humain, chat/chien',
+  'Miaulements nocturnes',
+  'Chat caressé-mordeur, chat craintif',
+  'Grignotage',
+  'Fugue',
+  'Griffades',
+  'Difficultés d’adaptation',
+  'Léchage excessif',
+  'Enrichissement de l’environnement',
+  'Préparation d’un déménagement',
+];
+
+const steps = [
+  { n: '01', title: 'Votre demande', text: `Vous remplissez le formulaire. Je vous contacte sous ${site.responseTime} pour convenir d’un rendez-vous.` },
+  { n: '02', title: 'La consultation', text: 'Chez vous : territoire, ressources, interactions, histoire. J’observe votre chat dans son environnement.' },
+  { n: '03', title: 'Le compte rendu', text: 'Un plan d’action écrit et personnalisé, transmis à votre vétérinaire si vous le souhaitez.' },
+  { n: '04', title: 'Le suivi', text: 'Un appel 15 jours plus tard, inclus : on évalue l’évolution et on ajuste.' },
+];
+
+const reasons = [
+  { title: 'Chez vous', text: 'Là où votre chat vit : son territoire, ses ressources, ses habitudes.' },
+  { title: 'Suivi inclus', text: 'Un appel 15 jours après la consultation complète, pour ajuster.' },
+  { title: 'Rapport écrit', text: 'Un plan clair, partageable avec votre vétérinaire.' },
+  { title: 'Sans contrainte', text: 'Des méthodes respectueuses de son tempérament et de ses émotions.' },
+];
+
+// Bandeau défilant : la liste est doublée pour une boucle continue
+const marquee = [...catPhotos, ...catPhotos];
+
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  '@id': `${site.url}/chat#service`,
+  name: 'Comportement félin, soins coopératifs et garde de chat à domicile à Genève',
+  serviceType: 'Comportement félin et garde de chat à domicile',
+  description:
+    'Consultations en comportement du chat à domicile à Genève ou en ligne : élimination hors litière, conflits entre chats, miaulements nocturnes, soins coopératifs et garde à domicile.',
+  provider: { '@id': `${site.url}/#business` },
+  areaServed: ['Genève', 'Grand-Lancy', 'Lancy', 'Carouge', 'Onex', 'Plan-les-Ouates', 'Bernex', 'Veyrier', 'Vernier', 'Suisse romande', 'France voisine'],
+  offers: consultations.chat.map((c) => ({
+    '@type': 'Offer',
+    name: c.name,
+    description: c.features.join(' · '),
+    price: c.price,
+    priceCurrency: 'CHF',
+    url: `${site.url}/chat#tarifs`,
+  })),
+};
+---
+
+<Base
+  title="Comportement du chat à Genève : consultation et garde à domicile"
+  description="Comportement du chat à Genève : malpropreté, conflits entre chats, miaulements, soins coopératifs. Consultation à domicile ou en ligne, dès CHF 80."
+  image={photos.arbreAChat}
+  imageAlt="Diablotine et Olympea installées sur leur arbre à chat – Comportement félin Genève"
+  schema={[serviceSchema]}
+>
+  <!-- ================= HERO ================= -->
+  <section class="ch-hero" id="top">
+    <div class="container ch-hero-head">
+      <p class="ch-kicker">Comportement félin à Genève</p>
+      <h1 class="ch-title">
+        <span class="t-line">Comprenez votre chat.</span>
+        <span class="t-line grad">Respectez sa nature.</span>
+      </h1>
+      <p class="ch-sub">
+        Intervenante en comportement félin, à domicile. Une approche douce, respectueuse de son tempérament et de ses émotions.
+      </p>
+      <div class="ch-actions btn-row">
+        <a href="/contact?animal=chat" class="btn">Prendre rendez-vous</a>
+        <a href="#tarifs" class="btn btn--ghost">Voir les tarifs</a>
+      </div>
+      <p class="ch-price">Consultation dès <strong>CHF 80</strong> · Consultation complète 1 h 30 <strong>CHF 130</strong></p>
+    </div>
+
+    <div class="ch-hero-media">
+      <Image
+        src={photos.tapisFouille}
+        alt="Diablotine, chatte tricolore, et Olympea, Maine Coon argenté, cherchent des friandises dans un tapis de fouille"
+        widths={[800, 1400, 2000, 2600]}
+        sizes="100vw"
+        loading="eager"
+        fetchpriority="high"
+        style="object-position:50% 40%"
+      />
+    </div>
+  </section>
+
+  <!-- ================= POINTS FORTS ================= -->
+  <section class="ch-highlights" id="points-forts">
+    <div class="container">
+      <h2 class="ch-h2 reveal">Les points forts.</h2>
+    </div>
+
+    <div class="hl" data-hl>
+      <ul class="hl-track" data-hl-track>
+        {
+          highlights.map((h, i) => (
+            <li class="hl-card" data-hl-card={i}>
+              <Image src={h.photo} alt={h.alt} widths={[600, 1000, 1600]} sizes="(max-width: 700px) 88vw, 1000px" style={`object-position:${h.pos}`} loading={i < 2 ? 'eager' : 'lazy'} />
+              <div class="hl-copy">
+                <p class="hl-label">{h.label}</p>
+                <h3 class="hl-title">{h.title}</h3>
+                <p class="hl-text">{h.text}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="container hl-controls">
+        <div class="hl-dots" role="tablist" aria-label="Points forts">
+          {
+            highlights.map((h, i) => (
+              <button class="hl-dot" type="button" role="tab" aria-label={h.label} data-hl-dot={i}>
+                <span></span>
+              </button>
+            ))
+          }
+          <button class="hl-play" type="button" data-hl-play aria-label="Mettre en pause">
+            <Icon name="pause" size={16} class="i-pause" />
+            <Icon name="play" size={16} class="i-play" />
+          </button>
+        </div>
+        <div class="hl-paddles">
+          <button type="button" class="hl-paddle" data-hl-prev aria-label="Précédent"><Icon name="chevron-left" size={22} /></button>
+          <button type="button" class="hl-paddle" data-hl-next aria-label="Suivant"><Icon name="chevron-right" size={22} /></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= UN COMPAGNON UNIQUE & REPÈRES ================= -->
+  <section class="ch-ethos">
+    <div class="container">
+      <div class="ethos-cocoon">
+        <div class="ethos-copy reveal">
+          <h2 class="ethos-title">
+            Un compagnon unique.<br />
+            <em class="ethos-accent">Indépendant et sensible.</em>
+          </h2>
+          <p class="ethos-sub">
+            Je vous accompagne pour mieux comprendre les besoins de votre chat, améliorer son bien-être et
+            faciliter les soins du quotidien, tout en respectant son tempérament et ses émotions.
+          </p>
+        </div>
+
+        <ul class="ethos-proofs">
+          {
+            proofs.map((p) => (
+              <li class="ethos-proof reveal">
+                <span class="proof-value">{p.value}</span>
+                <span class="proof-label">{p.label}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PRESTATIONS (photo fixe + liste) ================= -->
+  <section class="ch-bento-section" id="prestations">
+    <div class="container">
+      <div class="ch-section-head center reveal">
+        <h2 class="ch-h2">Un accompagnement sur mesure.<br /><span class="muted-line">Pour votre félin.</span></h2>
+      </div>
+
+      <div class="svc" data-svc>
+        <!-- Ordinateur : grande photo fixe qui change selon la prestation lue -->
+        <div class="svc-stage" aria-hidden="true">
+          {
+            services.map((sv, i) => (
+              <Image
+                src={sv.img}
+                alt=""
+                widths={[700, 1100]}
+                sizes="(max-width: 899px) 1px, 46vw"
+                class:list={['svc-photo', { 'is-active': i === 0 }]}
+                style={`object-position:${sv.pos}`}
+                data-svc-photo={i}
+              />
+            ))
+          }
+        </div>
+
+        <ol class="svc-list">
+          {
+            services.map((sv, i) => (
+              <li class:list={['svc-item', { 'is-active': i === 0 }]} data-svc-item={i}>
+                <div class="svc-thumb">
+                  <Image src={sv.img} alt={sv.alt} widths={[500, 900]} sizes="(min-width: 900px) 1px, 92vw" style={`object-position:${sv.pos}`} />
+                </div>
+                <p class="svc-name">{sv.name}</p>
+                <h3>{sv.title}</h3>
+                <p class="svc-text">{sv.text}</p>
+                {sv.link && <a class="svc-link" href={sv.link.href}>{sv.link.label}</a>}
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+
+      <div class="ch-center reveal">
+        <a href="/contact?animal=chat" class="btn">Réserver ma consultation</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SIGNAUX (situations) ================= -->
+  <section class="cat-signals" id="signaux">
+    <div class="container">
+      <div class="ch-section-head center reveal">
+        <h2 class="ch-h2">Ni caprice, ni vengeance.<br /><span class="muted-line">Des signaux.</span></h2>
+        <p class="signals-sub">
+          Les comprendre, c’est déjà commencer à les résoudre. Je vous accompagne notamment pour :
+        </p>
+      </div>
+      <ul class="signals reveal">
+        {
+          problems.map((p) => (
+            <li>
+              <PawIcon animal="cat" size={18} color="#3a9db4" />
+              <span>{p}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================= SOINS COOPÉRATIFS ================= -->
+  <section class="ch-care" id="soins-cooperatifs">
+    <div class="container">
+      <p class="ch-kicker reveal">Entraînement médical</p>
+      <h2 class="ch-statement reveal">
+        Des soins.<br /><span class="grad">Avec son accord.</span>
+      </h2>
+      <p class="ch-statement-sub reveal">
+        Les soins coopératifs ne veulent pas dire que votre chat adore être manipulé ou soigné. Cela
+        signifie que vous lui demandez son accord et que vous collaborez avec lui, avec son consentement.
+      </p>
+
+      <div class="cat-care">
+      <figure class="cat-care-photo reveal">
+        <Image
+          src={photos.diablotineMedical}
+          alt="Diablotine, chatte tricolore, installée calmement sur sa serviette pendant une séance d’entraînement aux soins, à côté d’un bol de récompenses"
+          widths={[600, 1000, 1600]}
+          sizes="(max-width: 960px) 92vw, 960px"
+        />
+        <figcaption>Diablotine en séance : elle choisit de rester sur sa serviette.</figcaption>
+      </figure>
+      <p class="cat-care-text reveal">
+        Brossage, coupe des griffes, caisse de transport, prise de médicaments : les apprentissages
+        sont adaptés à son âge, à son état de santé et à son rythme.
+      </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= DÉROULEMENT ================= -->
+  <section class="ch-steps-section" id="deroulement">
+    <div class="container">
+      <div class="ch-section-head center reveal">
+        <h2 class="ch-h2">Simple.<br /><span class="muted-line">Du premier message au suivi.</span></h2>
+      </div>
+      <!-- Un chemin relie les étapes et se remplit au défilement ; une patte de chat marque chaque étape -->
+      <ol class="ch-steps">
+        {
+          steps.map((s) => (
+            <li class="step reveal">
+              <span class="step-mark" aria-hidden="true">
+                <PawIcon animal="cat" size={20} />
+              </span>
+              <span class="step-n">{s.n}</span>
+              <h3>{s.title}</h3>
+              <p>{s.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+      <p class="vet-note reveal">
+        <Icon name="stethoscope" size={20} />
+        <span>
+          <strong>Un contrôle vétérinaire préalable est indispensable</strong> afin d’exclure toute cause
+          médicale. Je ne pose aucun diagnostic médical et ne conseille aucun traitement.
+        </span>
+      </p>
+      <div class="ch-center reveal">
+        <a href="/contact?animal=chat" class="btn">Faire ma demande</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= TARIFS (comparatif) ================= -->
+  <section class="ch-pricing" id="tarifs">
+    <div class="container">
+      <div class="ch-section-head center reveal">
+        <h2 class="ch-h2">Quelle formule pour votre chat ?</h2>
+      </div>
+      <div class="compare">
+        {
+          consultations.chat.map((c) => (
+            <article class="compare-col reveal">
+              <span class="compare-icon">
+                <PawIcon animal="cat" size={34} color="#3185c5" />
+              </span>
+              <h3>{c.name}</h3>
+              <p class="compare-duration">{c.duration}</p>
+              <p class="compare-price">CHF {c.price}</p>
+              <ul>
+                {c.features.map((f) => (
+                  <li>{f}</li>
+                ))}
+              </ul>
+              <a href={`/contact?animal=chat&prestation=${'comportement'}`} class="btn">Réserver</a>
+            </article>
+          ))
+        }
+        <article class="compare-col reveal">
+          <span class="compare-icon">
+            <PawIcon animal="cat" size={34} color="#3185c5" />
+          </span>
+          <h3>Garde à domicile</h3>
+          <p class="compare-duration">30 min à 1 h par jour</p>
+          <p class="compare-price">dès CHF 35</p>
+          <ul>
+            <li>Litières, repas et eau fraîche</li>
+            <li>Câlins, jeux ou simple présence, selon ses préférences</li>
+            <li>Nouvelles et photos chaque jour</li>
+          </ul>
+          <a href="/garde-a-domicile#chats" class="btn btn--ghost">Voir les offres</a>
+        </article>
+      </div>
+      <p class="compare-note reveal">
+        Déplacements inclus dans un rayon de {site.radiusKm} km autour de {site.base}, puis {site.kmFee}.
+        Certaines consultations sont possibles en ligne. Paiement par virement, TWINT ou espèces.
+      </p>
+    </div>
+  </section>
+
+  <!-- ================= RAISONS ================= -->
+  <section class="ch-reasons">
+    <div class="container">
+      <div class="ch-section-head center reveal">
+        <h2 class="ch-h2">Tant de raisons<br /><span class="muted-line">de faire le premier pas.</span></h2>
+      </div>
+      <ul class="reasons">
+        {
+          reasons.map((r) => (
+            <li class="reason reveal">
+              <h3>{r.title}</h3>
+              <p>{r.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================= BANDEAU PHOTO DÉFILANT ================= -->
+  <section class="ch-marquee" aria-label="Quelques félins rencontrés">
+    <div class="container">
+      <h2 class="ch-h2 reveal">Quelques félins<br /><span class="muted-line">rencontrés.</span></h2>
+    </div>
+    <div class="marquee">
+      <ul class="marquee-track">
+        {
+          marquee.map((p, i) => (
+            <li aria-hidden={i >= catPhotos.length ? 'true' : undefined}>
+              <figure>
+                <Image src={p.src} alt={i >= catPhotos.length ? '' : p.alt} widths={[340, 680]} sizes="340px" loading="lazy" />
+                <figcaption>{p.caption}</figcaption>
+              </figure>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <CtaBand
+    title="Prêt·e à offrir à votre chat une vie plus sereine ?"
+    text="Une vie en harmonie au sein de votre foyer, en entente avec vous ? Contactez-moi pour un accompagnement sur mesure."
+  />
+</Base>
+
+<script>
+  // ---------- Galerie « Points forts » : défilement automatique, points de progression, flèches
+  const hl = document.querySelector<HTMLElement>('[data-hl]');
+  if (hl) {
+    const track = hl.querySelector<HTMLElement>('[data-hl-track]')!;
+    const cards = [...hl.querySelectorAll<HTMLElement>('[data-hl-card]')];
+    const dots = [...hl.querySelectorAll<HTMLButtonElement>('[data-hl-dot]')];
+    const playBtn = hl.querySelector<HTMLButtonElement>('[data-hl-play]')!;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const DURATION = 6000;
+    let index = 0;
+    let playing = !reduce;
+    let inView = false;
+    let timer: number | undefined;
+
+    const setActive = (i: number) => {
+      index = i;
+      dots.forEach((d, j) => {
+        d.classList.toggle('is-active', j === i);
+        d.setAttribute('aria-selected', String(j === i));
+      });
+      cards.forEach((c, j) => c.classList.toggle('is-current', j === i));
+      // relance l'animation de remplissage du point actif
+      hl.classList.remove('is-running');
+      void hl.offsetWidth;
+      if (playing && inView) hl.classList.add('is-running');
+    };
+    const goTo = (i: number, smooth = true) => {
+      const target = cards[(i + cards.length) % cards.length];
+      track.scrollTo({ left: target.offsetLeft - cards[0].offsetLeft, behavior: smooth && !reduce ? 'smooth' : 'auto' });
+      setActive((i + cards.length) % cards.length);
+      schedule();
+    };
+    const schedule = () => {
+      window.clearTimeout(timer);
+      if (playing && inView) timer = window.setTimeout(() => goTo(index + 1), DURATION);
+    };
+    const setPlaying = (p: boolean) => {
+      playing = p;
+      hl.classList.toggle('is-paused', !p);
+      playBtn.setAttribute('aria-label', p ? 'Mettre en pause' : 'Lire');
+      setActive(index);
+      schedule();
+    };
+
+    dots.forEach((d, i) => d.addEventListener('click', () => goTo(i)));
+    hl.querySelector('[data-hl-prev]')!.addEventListener('click', () => goTo(index - 1));
+    hl.querySelector('[data-hl-next]')!.addEventListener('click', () => goTo(index + 1));
+    playBtn.addEventListener('click', () => setPlaying(!playing));
+
+    // Défilement manuel (doigt, trackpad) : on met à jour le point actif
+    let scrollTimer: number | undefined;
+    track.addEventListener(
+      'scroll',
+      () => {
+        window.clearTimeout(scrollTimer);
+        scrollTimer = window.setTimeout(() => {
+          const x = track.scrollLeft;
+          let best = 0;
+          cards.forEach((c, j) => {
+            if (Math.abs(c.offsetLeft - cards[0].offsetLeft - x) < Math.abs(cards[best].offsetLeft - cards[0].offsetLeft - x)) best = j;
+          });
+          if (best !== index) {
+            setActive(best);
+            schedule();
+          }
+        }, 120);
+      },
+      { passive: true },
+    );
+    track.addEventListener('pointerdown', () => playing && setPlaying(false));
+
+    new IntersectionObserver(
+      ([e]) => {
+        inView = e.isIntersecting;
+        setActive(index);
+        schedule();
+      },
+      { threshold: 0.4 },
+    ).observe(hl);
+    if (reduce) hl.classList.add('is-paused');
+    setActive(0);
+  }
+
+  // Prestations : la photo fixe suit la prestation au centre de l'écran
+  const svc = document.querySelector<HTMLElement>('[data-svc]');
+  if (svc) {
+    const items = [...svc.querySelectorAll<HTMLElement>('[data-svc-item]')];
+    const shots = [...svc.querySelectorAll<HTMLElement>('[data-svc-photo]')];
+    const wide = window.matchMedia('(min-width: 900px)');
+    let current = 0;
+    const setActive = (i: number) => {
+      if (i === current) return;
+      current = i;
+      items.forEach((el, k) => el.classList.toggle('is-active', k === i));
+      shots.forEach((el, k) => el.classList.toggle('is-active', k === i));
+    };
+    // la prestation active est celle qui croise le milieu de l'écran
+    let ticking = false;
+    const update = () => {
+      ticking = false;
+      if (!wide.matches) return;
+      const mid = window.innerHeight / 2;
+      let best = 0;
+      items.forEach((el, k) => {
+        if (el.getBoundingClientRect().top <= mid) best = k;
+      });
+      setActive(best);
+    };
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(update);
+        }
+      },
+      { passive: true },
+    );
+    items.forEach((el, i) => {
+      el.addEventListener('pointerenter', (ev) => wide.matches && ev.pointerType === 'mouse' && setActive(i));
+    });
+    // précharge les photos de la scène pour un fondu sans trou
+    shots.forEach((el) => el.setAttribute('loading', 'eager'));
+    svc.classList.add('is-live');
+    update();
+  }
+
+  // Vidéo soins coopératifs : lecture seulement quand elle est visible, bouton pause,
+  // et pas de lecture automatique si l'utilisateur préfère moins d'animations
+  const careVideo = document.querySelector<HTMLVideoElement>('[data-care-video]');
+  const careToggle = document.querySelector<HTMLButtonElement>('[data-care-toggle]');
+  if (careVideo && careToggle) {
+    const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let userPaused = calm;
+    const sync = () => {
+      const paused = careVideo.paused;
+      careToggle.classList.toggle('is-paused', paused);
+      careToggle.setAttribute('aria-label', paused ? 'Lire la vidéo' : 'Mettre la vidéo en pause');
+    };
+    careVideo.addEventListener('play', sync);
+    careVideo.addEventListener('pause', sync);
+    careToggle.addEventListener('click', () => {
+      if (careVideo.paused) {
+        userPaused = false;
+        careVideo.play().catch(() => {});
+      } else {
+        userPaused = true;
+        careVideo.pause();
+      }
+    });
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(
+        ([e]) => {
+          if (e.isIntersecting && !userPaused) careVideo.play().catch(() => {});
+          else if (!e.isIntersecting) careVideo.pause();
+        },
+        { threshold: 0.35 },
+      ).observe(careVideo);
+    }
+    sync();
+  }
+</script>
+
+<style>
+  /* ============================================================
+     Typographie « Apple »
+     ============================================================ */
+  .grad {
+    background: linear-gradient(100deg, #3185c5 10%, #3a9db4 50%, #46b59c 90%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .ch-kicker {
+    font-size: clamp(0.95rem, 0.9rem + 0.3vw, 1.15rem);
+    font-weight: 600;
+    color: var(--teal-700);
+    margin: 0 0 14px;
+  }
+  .ch-h2 {
+    font-size: clamp(2.2rem, 1.4rem + 3.4vw, 4.2rem);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 1.04;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .muted-line {
+    display: inline-block;
+    text-wrap: balance;
+    color: #8a97a3;
+  }
+  .ch-section-head {
+    margin-bottom: clamp(36px, 5vw, 64px);
+  }
+  .ch-section-head.center {
+    text-align: center;
+  }
+  .ch-center {
+    display: flex;
+    justify-content: center;
+    margin-top: clamp(40px, 5vw, 64px);
+  }
+
+  /* ============================================================
+     Hero
+     ============================================================ */
+  .ch-hero {
+    padding-top: clamp(48px, 7vw, 96px);
+    background: var(--cream);
+    overflow: hidden;
+  }
+  .ch-hero-head {
+    text-align: center;
+  }
+  .ch-title {
+    font-size: clamp(2.7rem, 1.2rem + 6vw, 6.6rem);
+    font-weight: 500;
+    letter-spacing: -0.035em;
+    line-height: 1.02;
+    margin: 0 auto 24px;
+    max-width: 22ch;
+  }
+  .t-line {
+    display: block;
+  }
+  .ch-sub {
+    font-size: clamp(1.1rem, 1rem + 0.5vw, 1.45rem);
+    color: var(--muted);
+    max-width: 40ch;
+    margin: 0 auto 32px;
+    line-height: 1.45;
+  }
+  .ch-actions {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .ch-price {
+    margin: 22px 0 0;
+    font-size: 0.95rem;
+    color: var(--muted);
+  }
+  .ch-price strong {
+    color: var(--teal-950);
+    font-weight: 600;
+  }
+  .ch-hero-media {
+    margin-top: clamp(40px, 6vw, 80px);
+    height: clamp(340px, 60vw, 860px);
+    overflow: hidden;
+    clip-path: inset(0 var(--gutter) round 28px);
+  }
+  .ch-hero-media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 45%;
+  }
+  /* Entrée en douceur du titre au chargement */
+  @media (prefers-reduced-motion: no-preference) {
+    .t-line,
+    .ch-sub,
+    .ch-actions,
+    .ch-price,
+    .ch-kicker {
+      animation: rise 0.9s var(--ease) both;
+    }
+    .ch-hero-head .ch-kicker {
+      animation-delay: 0s;
+    }
+    .t-line:nth-child(1) {
+      animation-delay: 0.08s;
+    }
+    .t-line:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    .ch-sub {
+      animation-delay: 0.32s;
+    }
+    .ch-actions {
+      animation-delay: 0.42s;
+    }
+    .ch-price {
+      animation-delay: 0.5s;
+    }
+    .ch-hero-media {
+      animation: media-in 1.2s var(--ease) 0.25s both;
+    }
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+  }
+  @keyframes media-in {
+    from {
+      opacity: 0;
+      transform: translateY(40px) scale(0.97);
+    }
+  }
+  /* L'image s'ouvre en pleine largeur au défilement (navigateurs compatibles) */
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .ch-hero-media {
+        animation:
+          media-in 1.2s var(--ease) 0.25s both,
+          media-open linear both;
+        animation-timeline: auto, scroll(root);
+        animation-range:
+          normal,
+          0px 640px;
+      }
+      .ch-hero-media :global(img) {
+        animation: media-zoom linear both;
+        animation-timeline: scroll(root);
+        animation-range: 0px 900px;
+      }
+    }
+  }
+  @keyframes media-open {
+    to {
+      clip-path: inset(0 0 round 0);
+    }
+  }
+  @keyframes media-zoom {
+    from {
+      transform: scale(1.12);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+
+  /* ============================================================
+     Points forts (galerie)
+     ============================================================ */
+  .ch-highlights {
+    padding-block: clamp(72px, 9vw, 128px) clamp(56px, 7vw, 96px);
+    background: var(--cream);
+  }
+  .ch-highlights .ch-h2 {
+    margin-bottom: clamp(28px, 4vw, 48px);
+  }
+  .hl-track {
+    --inset: max(var(--gutter), calc((100vw - var(--container)) / 2));
+    list-style: none;
+    margin: 0;
+    padding: 0 var(--inset);
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--inset);
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+  }
+  .hl-track::-webkit-scrollbar {
+    display: none;
+  }
+  .hl-card {
+    position: relative;
+    flex: 0 0 min(1020px, 86vw);
+    height: clamp(460px, 58vw, 680px);
+    border-radius: 28px;
+    overflow: hidden;
+    scroll-snap-align: start;
+    background: var(--teal-900);
+  }
+  .hl-card :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.06);
+    transition: transform 1.6s var(--ease);
+  }
+  .hl-card.is-current :global(img) {
+    transform: scale(1);
+  }
+  .hl-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgb(8 22 32 / 0) 40%, rgb(8 22 32 / 0.78) 100%);
+    pointer-events: none;
+  }
+  .hl-copy {
+    position: absolute;
+    z-index: 1;
+    left: clamp(22px, 4vw, 48px);
+    right: clamp(22px, 4vw, 48px);
+    bottom: clamp(24px, 4vw, 48px);
+    color: var(--white);
+    opacity: 0.4;
+    transform: translateY(12px);
+    transition:
+      opacity 0.8s var(--ease) 0.2s,
+      transform 0.8s var(--ease) 0.2s;
+  }
+  .hl-card.is-current .hl-copy {
+    opacity: 1;
+    transform: none;
+  }
+  .hl-label {
+    margin: 0 0 8px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #9fe0cf;
+  }
+  .hl-title {
+    color: var(--white);
+    font-size: clamp(1.7rem, 1.2rem + 2vw, 3rem);
+    font-weight: 500;
+    letter-spacing: -0.025em;
+    line-height: 1.08;
+    margin: 0 0 10px;
+    max-width: 18ch;
+  }
+  .hl-text {
+    margin: 0;
+    max-width: 44ch;
+    font-size: clamp(1rem, 0.95rem + 0.25vw, 1.15rem);
+    color: rgb(255 255 255 / 0.86);
+  }
+  .hl-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .hl-dots {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--sand-deep) 55%, transparent);
+  }
+  .hl-dot {
+    position: relative;
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: #a9b4bc;
+    cursor: pointer;
+    overflow: hidden;
+    transition:
+      width 0.45s var(--ease),
+      background-color 0.3s;
+  }
+  .hl-dot.is-active {
+    width: 44px;
+    background: #c9d2d8;
+  }
+  .hl-dot span {
+    position: absolute;
+    inset: 0;
+    width: 0;
+    border-radius: inherit;
+    background: var(--teal-800);
+  }
+  .hl-dot.is-active span {
+    width: 100%;
+  }
+  .hl.is-running .hl-dot.is-active span {
+    animation: dot-fill 6s linear both;
+  }
+  @keyframes dot-fill {
+    from {
+      width: 0;
+    }
+  }
+  .hl-play {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    margin-left: 4px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--teal-950);
+    cursor: pointer;
+  }
+  .hl-play :global(.i-play) {
+    display: none;
+  }
+  .hl.is-paused .hl-play :global(.i-play) {
+    display: block;
+  }
+  .hl.is-paused .hl-play :global(.i-pause) {
+    display: none;
+  }
+  .hl-paddles {
+    display: flex;
+    gap: 12px;
+  }
+  .hl-paddle {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 0;
+    background: color-mix(in srgb, var(--sand-deep) 55%, transparent);
+    color: var(--teal-950);
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  @media (hover: hover) {
+    .hl-paddle:hover {
+      background: var(--sand-deep);
+    }
+  }
+  @media (max-width: 600px) {
+    .hl-paddles {
+      display: none;
+    }
+    .hl-controls {
+      justify-content: center;
+    }
+  }
+
+  /* ============================================================
+     Approche & repères (cocon clair brume d’eau & crème)
+     ============================================================ */
+  .ch-ethos {
+    /* paire sable : repères + prestations */
+    padding-block: clamp(72px, 9vw, 128px) clamp(40px, 5vw, 72px);
+    background: var(--sand);
+  }
+  /* Une seule surface claire : titre centré, puis 4 repères séparés par des filets */
+  .ethos-cocoon {
+    display: grid;
+    gap: clamp(40px, 5vw, 72px);
+    text-align: center;
+    /* posé directement sur le fond de la page, sans encadré */
+    padding-block: clamp(48px, 6vw, 96px) clamp(16px, 3vw, 40px);
+  }
+  .ethos-title {
+    font-size: clamp(2rem, 1.3rem + 2.6vw, 3.6rem);
+    font-weight: 450;
+    letter-spacing: -0.025em;
+    line-height: 1.06;
+    color: var(--teal-950);
+    margin: 0 0 22px;
+    text-wrap: balance;
+  }
+  .ethos-accent {
+    /* bloc à part pour que la coupure soit équilibrée (« Fondée sur / la science. ») */
+    display: inline-block;
+    text-wrap: balance;
+    font-style: italic;
+    font-weight: 430;
+    background: linear-gradient(105deg, #2770a6 0%, #328ca3 50%, #3da38d 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    padding-right: 0.06em;
+  }
+  .ethos-sub {
+    margin: 0 auto;
+    max-width: 52ch;
+    font-size: clamp(1.03rem, 0.98rem + 0.26vw, 1.18rem);
+    line-height: 1.62;
+    color: var(--muted);
+    text-wrap: pretty;
+  }
+
+  .ethos-proofs {
+    --rule: rgb(21 61 85 / 0.12);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-top: 1px solid var(--rule);
+  }
+  .ethos-proof {
+    display: grid;
+    align-content: start;
+    justify-items: center;
+    gap: 12px;
+    padding: 28px 10px 6px;
+  }
+  /* grille 2 × 2 : filet vertical au milieu, filet horizontal entre les rangées */
+  .ethos-proof:nth-child(even) {
+    border-left: 1px solid var(--rule);
+  }
+  .ethos-proof:nth-child(n + 3) {
+    border-top: 1px solid var(--rule);
+    padding-top: 26px;
+    margin-top: 22px;
+  }
+  @media (min-width: 900px) {
+    .ethos-proofs {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .ethos-proof {
+      padding: clamp(32px, 3.4vw, 48px) clamp(16px, 2vw, 32px) 0;
+    }
+    .ethos-proof + .ethos-proof {
+      border-left: 1px solid var(--rule);
+    }
+    .ethos-proof:nth-child(n + 3) {
+      border-top: 0;
+      margin-top: 0;
+      padding-top: clamp(32px, 3.4vw, 48px);
+    }
+  }
+  /* entrée en cascade, une fois */
+  .ethos-proof:nth-child(2) {
+    transition-delay: 0.06s;
+  }
+  .ethos-proof:nth-child(3) {
+    transition-delay: 0.12s;
+  }
+  .ethos-proof:nth-child(4) {
+    transition-delay: 0.18s;
+  }
+  .proof-value {
+    font-family: var(--font-display);
+    font-size: clamp(2.1rem, 1.5rem + 2.2vw, 3.6rem);
+    font-weight: 430;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    color: var(--teal-950);
+    white-space: nowrap;
+  }
+  .proof-label {
+    max-width: 24ch;
+    font-size: clamp(0.86rem, 0.82rem + 0.2vw, 0.98rem);
+    line-height: 1.45;
+    color: var(--muted);
+    text-wrap: balance;
+  }
+
+  /* ============================================================
+     Signaux : les situations, en pastilles centrées
+     ============================================================ */
+  .cat-signals {
+    background: var(--blush);
+    padding-block: clamp(88px, 11vw, 150px) clamp(56px, 7vw, 96px);
+  }
+  .signals-sub {
+    margin: 20px auto 0;
+    max-width: 52ch;
+    color: var(--muted);
+    font-size: clamp(1.03rem, 0.98rem + 0.26vw, 1.18rem);
+    line-height: 1.6;
+    text-wrap: pretty;
+  }
+  .signals {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
+  .signals li {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px 12px 16px;
+    border-radius: 999px;
+    background: var(--white);
+    border: 1px solid rgb(21 61 85 / 0.08);
+    color: var(--teal-950);
+    font-weight: 550;
+    font-size: clamp(0.92rem, 0.88rem + 0.2vw, 1.02rem);
+    line-height: 1.3;
+  }
+  .signals :global(svg) {
+    flex: none;
+  }
+
+  /* Soins coopératifs (chat) : une photo, puis le texte */
+  .cat-care {
+    display: grid;
+    gap: clamp(28px, 4vw, 48px);
+    align-items: center;
+  }
+  @media (min-width: 900px) {
+    .cat-care {
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+      gap: clamp(48px, 6vw, 112px);
+    }
+    .cat-care .cat-care-text {
+      margin: 0;
+      max-width: none;
+      text-align: left;
+      font-size: clamp(1.1rem, 1rem + 0.5vw, 1.45rem);
+    }
+  }
+  .cat-care-photo {
+    margin: 0;
+  }
+  .cat-care-photo :global(img) {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    object-position: 45% 45%;
+    border-radius: clamp(20px, 2.4vw, 32px);
+    box-shadow: 0 40px 80px -44px rgb(15 44 61 / 0.45);
+  }
+  .cat-care-photo figcaption {
+    margin-top: 14px;
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--muted);
+  }
+  .cat-care-text {
+    margin: clamp(28px, 3vw, 40px) auto 0;
+    max-width: 52ch;
+    color: var(--muted);
+    font-size: clamp(1.03rem, 0.98rem + 0.26vw, 1.18rem);
+    line-height: 1.6;
+  }
+
+  /* Note vétérinaire sous les étapes */
+  .vet-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    max-width: 680px;
+    margin: clamp(40px, 5vw, 56px) auto 0;
+    padding: 18px 22px;
+    border-radius: 18px;
+    background: var(--white);
+    border: 1px solid rgb(21 61 85 / 0.08);
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.55;
+  }
+  .vet-note :global(svg) {
+    flex: none;
+    margin-top: 2px;
+    color: var(--teal-600);
+  }
+  .vet-note strong {
+    color: var(--teal-950);
+  }
+
+  /* ============================================================
+     Section sombre (soins coopératifs)
+     ============================================================ */
+  .ch-care {
+    /* paire rose poudré : signaux + soins */
+    background: var(--blush);
+    color: var(--muted);
+    padding-block: clamp(24px, 4vw, 56px) clamp(88px, 11vw, 150px);
+  }
+  .ch-statement {
+    color: var(--teal-950);
+    font-size: clamp(2.3rem, 1.3rem + 4vw, 5rem);
+    font-weight: 500;
+    letter-spacing: -0.035em;
+    line-height: 1.03;
+    margin: 0 0 24px;
+  }
+  .ch-statement-sub {
+    max-width: 52ch;
+    font-size: clamp(1.05rem, 1rem + 0.4vw, 1.35rem);
+    line-height: 1.5;
+    margin: 0 0 clamp(48px, 7vw, 96px);
+  }
+
+  /* ============================================================
+     Prestations : grille de tuiles
+     ============================================================ */
+  .ch-bento-section {
+    background: var(--sand);
+    padding-block: clamp(24px, 4vw, 56px) clamp(88px, 11vw, 150px);
+  }
+  /* Liste éditoriale + photo fixe (ordinateur) */
+  .svc {
+    display: grid;
+    gap: 0;
+  }
+  .svc-stage {
+    display: none;
+  }
+  .svc-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid rgb(21 61 85 / 0.12);
+  }
+  .svc-item {
+    padding-block: clamp(28px, 4vw, 52px);
+    border-bottom: 1px solid rgb(21 61 85 / 0.12);
+    transition: opacity 0.35s var(--ease);
+  }
+  .svc-thumb {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 22px;
+    background: var(--cream);
+  }
+  .svc-thumb :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .svc-name {
+    margin: 0 0 6px;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--teal-700);
+  }
+  .svc-item h3 {
+    margin: 0 0 12px;
+    font-size: clamp(1.55rem, 1.2rem + 1.2vw, 2.3rem);
+    font-weight: 450;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    color: var(--teal-950);
+    text-wrap: balance;
+  }
+  .svc-text {
+    margin: 0;
+    max-width: 46ch;
+    color: var(--muted);
+    line-height: 1.6;
+    text-wrap: pretty;
+  }
+  .svc-link {
+    display: inline-block;
+    margin-top: 14px;
+    font-weight: 600;
+    color: var(--teal-700);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  @media (min-width: 900px) {
+    .svc {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: clamp(48px, 6vw, 112px);
+      align-items: start;
+    }
+    .svc-stage {
+      display: block;
+      position: sticky;
+      top: 104px;
+      height: min(calc(100vh - 140px), 760px);
+      border-radius: 32px;
+      overflow: hidden;
+      background: var(--teal-950);
+      box-shadow: 0 30px 60px -34px rgb(15 44 61 / 0.35);
+    }
+    .svc-stage :global(.svc-photo) {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transform: scale(1.04);
+      transition:
+        opacity 0.6s var(--ease),
+        transform 1.2s var(--ease);
+    }
+    .svc-stage :global(.svc-photo.is-active) {
+      opacity: 1;
+      transform: none;
+    }
+    .svc-thumb {
+      display: none;
+    }
+    .svc-item {
+      padding-block: clamp(44px, 5vw, 72px);
+    }
+    /* la prestation lue reste nette, les autres s'estompent (uniquement si le JS tourne) */
+    .svc.is-live .svc-item:not(.is-active) {
+      opacity: 0.38;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .svc-stage :global(.svc-photo) {
+      transform: none;
+      transition: opacity 0.3s linear;
+    }
+  }
+
+  /* ============================================================
+     Soins coopératifs : grille de photos
+     ============================================================ */
+  /* Section sombre centrée */
+  .ch-care .container {
+    text-align: center;
+  }
+  .ch-care .ch-statement-sub {
+    margin-inline: auto;
+  }
+  .ch-care .ch-statement {
+    text-wrap: balance;
+  }
+  /* Vidéo en grand */
+  .care-film {
+    position: relative;
+    border-radius: clamp(20px, 2.4vw, 32px);
+    overflow: hidden;
+    background: var(--teal-950);
+    aspect-ratio: 16 / 9;
+    box-shadow: 0 40px 80px -44px rgb(15 44 61 / 0.45);
+  }
+  .care-video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  @media (max-width: 699px) {
+    /* format vertical sur téléphone : la scène occupe l'écran */
+    .care-film {
+      aspect-ratio: 4 / 5;
+    }
+    .care-video {
+      object-position: 42% 50%;
+    }
+  }
+  .care-film::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(180deg, transparent 62%, rgb(4 14 20 / 0.6));
+  }
+  .care-film-caption {
+    position: absolute;
+    z-index: 1;
+    left: clamp(18px, 2.4vw, 32px);
+    right: 80px;
+    bottom: clamp(16px, 2vw, 28px);
+    margin: 0;
+    text-align: left;
+    color: var(--white);
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(1rem, 0.9rem + 0.5vw, 1.35rem);
+  }
+  .care-toggle {
+    position: absolute;
+    z-index: 2;
+    right: clamp(14px, 2vw, 24px);
+    bottom: clamp(14px, 2vw, 24px);
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 50%;
+    color: var(--white);
+    background: rgb(255 255 255 / 0.18);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    cursor: pointer;
+    transition:
+      background-color 0.2s ease,
+      transform 0.16s ease-out;
+  }
+  .care-toggle:active {
+    transform: scale(0.94);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .care-toggle:hover {
+      background: rgb(255 255 255 / 0.3);
+    }
+  }
+  .care-toggle :global(.i-play),
+  .care-toggle.is-paused :global(.i-pause) {
+    display: none;
+  }
+  .care-toggle.is-paused :global(.i-play) {
+    display: block;
+  }
+  /* La vidéo grandit en entrant dans l'écran (navigateurs compatibles) */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .care-film {
+        animation: film-grow linear both;
+        animation-timeline: view();
+        animation-range: entry 0% cover 35%;
+      }
+    }
+  }
+  @keyframes film-grow {
+    from {
+      transform: scale(0.9);
+    }
+    to {
+      transform: none;
+    }
+  }
+
+  /* 3 photos : en rangée sur ordinateur, à faire défiler au doigt sur mobile */
+  .care-grid {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 78%;
+    gap: 14px;
+    margin: clamp(20px, 2.4vw, 32px) calc(var(--gutter) * -1) 0;
+    padding: 0 var(--gutter) 4px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--gutter);
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+  }
+  .care-grid::-webkit-scrollbar {
+    display: none;
+  }
+  @media (min-width: 700px) {
+    .care-grid {
+      grid-auto-flow: row;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: clamp(14px, 1.6vw, 24px);
+      margin-inline: 0;
+      padding: 0;
+      overflow: visible;
+    }
+  }
+  .care-item {
+    margin: 0;
+    scroll-snap-align: start;
+    text-align: left;
+  }
+  .care-item :global(img) {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: clamp(16px, 1.8vw, 24px);
+  }
+  .care-item figcaption {
+    margin-top: 12px;
+    font-size: 0.95rem;
+    color: var(--muted);
+  }
+  .care-grid .care-item:nth-child(2) {
+    transition-delay: 0.08s;
+  }
+  .care-grid .care-item:nth-child(3) {
+    transition-delay: 0.16s;
+  }
+
+  /* ============================================================
+     Déroulement
+     ============================================================ */
+  .ch-steps-section {
+    background: var(--cream);
+    padding-block: clamp(88px, 11vw, 150px);
+  }
+  .ch-steps {
+    --mark: 44px;
+    --track: 2px;
+    position: relative;
+    list-style: none;
+    margin: 0 auto;
+    padding: 0;
+    display: grid;
+    gap: 36px;
+    max-width: 620px;
+  }
+  /* le chemin : trait gris + remplissage en dégradé du logo */
+  .ch-steps::before,
+  .ch-steps::after {
+    content: '';
+    position: absolute;
+    left: calc(var(--mark) / 2 - var(--track) / 2);
+    top: calc(var(--mark) / 2);
+    bottom: 0;
+    width: var(--track);
+    border-radius: 2px;
+    background: var(--line);
+  }
+  .ch-steps::after {
+    background: linear-gradient(180deg, #3185c5, #46b59c);
+    transform-origin: top;
+  }
+  .step {
+    position: relative;
+    padding-left: calc(var(--mark) + 20px);
+    min-height: var(--mark);
+  }
+  .step-mark {
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    display: grid;
+    place-items: center;
+    width: var(--mark);
+    height: var(--mark);
+    border-radius: 50%;
+    background: var(--cream);
+    border: 2px solid var(--line);
+    color: var(--teal-600);
+    transition:
+      background-color 0.4s ease,
+      border-color 0.4s ease,
+      color 0.4s ease;
+  }
+  .step-mark {
+    z-index: 2;
+  }
+  /* vertical : pas de ligne sous la dernière étape */
+  .step:last-child::after {
+    content: '';
+    position: absolute;
+    z-index: 1;
+    left: calc(var(--mark) / 2 - 4px);
+    top: var(--mark);
+    bottom: -4px;
+    width: 8px;
+    background: var(--cream);
+  }
+  /* étape 4 = l'arrivée : patte en dégradé du logo avec un halo */
+  .step:last-child .step-mark {
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--teal-500) 18%, transparent);
+  }
+  .step:last-child:global(.is-visible) .step-mark {
+    background: var(--brand-gradient);
+    border-color: transparent;
+  }
+  /* la patte s'allume quand l'étape apparaît */
+  .step:global(.is-visible) .step-mark {
+    background: var(--teal-600);
+    border-color: var(--teal-600);
+    color: var(--white);
+  }
+  .step-n {
+    display: block;
+    font-family: var(--font-display);
+    font-size: clamp(2.2rem, 1.6rem + 2.4vw, 4.2rem);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    margin: 2px 0 12px;
+    background: linear-gradient(100deg, #3185c5, #46b59c);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .ch-steps h3 {
+    font-size: clamp(1.25rem, 1.15rem + 0.4vw, 1.45rem);
+    margin: 0 0 8px;
+  }
+  .ch-steps p {
+    margin: 0;
+    color: var(--muted);
+    max-width: 34ch;
+  }
+  /* Écran large (dès 960 px) : chemin horizontal au-dessus des 4 étapes */
+  @media (min-width: 960px) {
+    /* 4 colonnes égales, chaque étape centrée sous sa patte : tout est symétrique */
+    .ch-steps {
+      --col: calc((100% - 3 * 32px) / 4);
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 32px;
+      max-width: none;
+    }
+    .ch-steps::before,
+    .ch-steps::after {
+      /* du centre de la patte 01 au centre de la patte 04 */
+      left: calc(var(--col) / 2);
+      right: calc(var(--col) / 2);
+      top: calc(var(--mark) / 2 - var(--track) / 2);
+      bottom: auto;
+      width: auto;
+      height: var(--track);
+    }
+    .ch-steps::after {
+      transform-origin: left;
+    }
+    .step {
+      padding-left: 0;
+      padding-top: calc(var(--mark) + 28px);
+      text-align: center;
+    }
+    .step-mark {
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .ch-steps p {
+      margin-inline: auto;
+    }
+    .step:last-child::after {
+      display: none;
+    }
+  }
+  /* le chemin se remplit au fil du défilement (navigateurs compatibles) */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .ch-steps::after {
+        animation: path-fill-y linear both;
+        animation-timeline: view();
+        animation-range: entry 40% cover 60%;
+      }
+      @media (min-width: 960px) {
+        .ch-steps::after {
+          animation-name: path-fill-x;
+          animation-range: entry 80% cover 50%;
+        }
+      }
+    }
+  }
+  @keyframes path-fill-y {
+    from {
+      transform: scaleY(0);
+    }
+  }
+  @keyframes path-fill-x {
+    from {
+      transform: scaleX(0);
+    }
+  }
+  .ch-steps li:nth-child(2),
+  .ch-steps li:nth-child(2) .step-mark {
+    transition-delay: 0.12s;
+  }
+  .ch-steps li:nth-child(3),
+  .ch-steps li:nth-child(3) .step-mark {
+    transition-delay: 0.24s;
+  }
+  .ch-steps li:nth-child(4),
+  .ch-steps li:nth-child(4) .step-mark {
+    transition-delay: 0.36s;
+  }
+
+  /* ============================================================
+     Tarifs : comparatif en colonnes
+     ============================================================ */
+  .ch-pricing {
+    /* même fond crème que les étapes juste au-dessus */
+    background: var(--cream);
+    padding-block: clamp(24px, 4vw, 56px) clamp(88px, 11vw, 150px);
+  }
+  .compare {
+    display: grid;
+    gap: 0;
+  }
+  @media (min-width: 900px) {
+    .compare {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .compare-col + .compare-col {
+      border-left: 1px solid var(--line);
+    }
+  }
+  .compare-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 36px clamp(20px, 3vw, 44px);
+  }
+  @media (max-width: 899px) {
+    .compare-col + .compare-col {
+      border-top: 1px solid var(--line);
+    }
+  }
+  .compare-icon {
+    display: grid;
+    place-items: center;
+    height: 48px;
+    color: var(--teal-600);
+    margin-bottom: 18px;
+  }
+  .compare-col h3 {
+    font-size: clamp(1.4rem, 1.2rem + 0.6vw, 1.8rem);
+    margin: 0 0 6px;
+  }
+  .compare-duration {
+    color: var(--muted);
+    margin: 0 0 18px;
+  }
+  .compare-price {
+    font-family: var(--font-display);
+    font-size: clamp(2.2rem, 1.6rem + 2vw, 3.2rem);
+    letter-spacing: -0.03em;
+    color: var(--teal-950);
+    margin: 0 0 24px;
+    line-height: 1;
+  }
+  .compare-col ul {
+    list-style: none;
+    margin: 0 0 32px;
+    padding: 0;
+    display: grid;
+    gap: 14px;
+    color: var(--muted);
+    max-width: 30ch;
+  }
+  .compare-col ul li + li {
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+  }
+  .compare-col .btn {
+    margin-top: auto;
+  }
+  .compare-note {
+    margin: 40px auto 0;
+    max-width: 60ch;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.92rem;
+  }
+
+  /* ============================================================
+     Raisons
+     ============================================================ */
+  .ch-reasons {
+    /* paire sable : raisons + galerie */
+    background: var(--sand);
+    padding-block: clamp(88px, 11vw, 150px);
+  }
+  .reasons {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 20px;
+  }
+  @media (min-width: 640px) {
+    .reasons {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (min-width: 1100px) {
+    .reasons {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  .reason {
+    background: var(--white);
+    border-radius: 24px;
+    padding: 32px 28px;
+    transition: transform 0.4s var(--ease);
+  }
+  @media (hover: hover) {
+    .reason:hover {
+      transform: translateY(-4px);
+    }
+  }
+  .reason h3 {
+    font-size: 1.35rem;
+    margin: 0 0 8px;
+  }
+  .reason p {
+    margin: 0;
+    color: var(--muted);
+  }
+  .reasons .reason:nth-child(2) {
+    transition-delay: 0.08s;
+  }
+  .reasons .reason:nth-child(3) {
+    transition-delay: 0.16s;
+  }
+  .reasons .reason:nth-child(4) {
+    transition-delay: 0.24s;
+  }
+
+  /* ============================================================
+     Bandeau photo défilant
+     ============================================================ */
+  .ch-marquee .ch-h2 {
+    text-align: center;
+  }
+  .ch-marquee {
+    background: var(--sand);
+    padding-block: clamp(24px, 4vw, 56px) clamp(40px, 5vw, 64px);
+    overflow: hidden;
+  }
+  .ch-marquee .ch-h2 {
+    margin-bottom: clamp(32px, 4vw, 56px);
+  }
+  .marquee-track {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 20px;
+    width: max-content;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .marquee-track {
+      animation: marquee 70s linear infinite;
+    }
+    .marquee:hover .marquee-track {
+      animation-play-state: paused;
+    }
+  }
+  @keyframes marquee {
+    to {
+      transform: translateX(calc(-50% - 10px));
+    }
+  }
+  .marquee figure {
+    margin: 0;
+    width: clamp(220px, 24vw, 340px);
+  }
+  .marquee :global(img) {
+    width: 100%;
+    aspect-ratio: 4/5;
+    object-fit: cover;
+    border-radius: 20px;
+  }
+  .marquee figcaption {
+    margin-top: 10px;
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--muted);
+  }
+
+  /* Mobile : titres et hero centrés et un peu plus compacts */
+  @media (max-width: 600px) {
+    .reasons {
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .reason {
+      padding: 22px 14px;
+    }
+    .reason h3 {
+      font-size: 1.1rem;
+    }
+    .reason p {
+      font-size: 0.88rem;
+    }
+    .ch-hero-media {
+      clip-path: inset(0 var(--gutter) round 22px);
+    }
+    .ch-section-head,
+    .ch-highlights .ch-h2,
+    .ch-marquee .ch-h2 {
+      text-align: center;
+    }
+    .ch-care .container,
+    .ethos-copy {
+      text-align: center;
+    }
+    .ch-statement-sub,
+    .ethos-sub {
+      margin-inline: auto;
+    }
+    .reason {
+      text-align: center;
+    }
+  }
+</style>

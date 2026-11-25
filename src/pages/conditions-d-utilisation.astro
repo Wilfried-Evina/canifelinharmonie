@@ -1,0 +1,77 @@
+---
+import Base from '../layouts/Base.astro';
+import LegalPage from '../components/LegalPage.astro';
+import { site } from '../data/site';
+---
+
+<Base title="Conditions d’utilisation" description="Conditions d’utilisation du site canifelinharmonie.ch et conditions générales des prestations.">
+  <LegalPage
+    title="Conditions d’utilisation"
+    updated="25 novembre 2026"
+    sections={['Éditeur du site', 'Objet', 'Nature des prestations', 'Rendez-vous et annulation', 'Tarifs et paiement', 'Responsabilité', 'Propriété intellectuelle', 'Liens externes', 'Droit applicable et for']}
+    other={{ href: '/politique-de-confidentialite', label: 'Politique de confidentialité' }}
+  >
+
+        <h2 id="s1">1. Éditeur du site</h2>
+        <p>
+          Le site canifelinharmonie.ch est édité par {site.owner}, raison individuelle « {site.name} »,{' '}
+          {site.address} (Suisse). Contact : <a href={`mailto:${site.email}`}>{site.email}</a>.
+        </p>
+
+        <h2 id="s2">2. Objet</h2>
+        <p>
+          Les présentes conditions régissent l’utilisation du site et les prestations proposées :
+          éducation et conseil en comportement canin et félin, soins coopératifs et garde d’animaux à
+          domicile.
+        </p>
+
+        <h2 id="s3">3. Nature des prestations</h2>
+        <p>
+          Les prestations relèvent de l’éducation et du conseil comportemental. Elles ne remplacent en
+          aucun cas un avis vétérinaire. Aucun diagnostic médical n’est posé. Un contrôle vétérinaire
+          préalable est recommandé pour tout trouble du comportement.
+        </p>
+        <p>
+          Le résultat d’un accompagnement dépend de nombreux facteurs, notamment de l’application des
+          recommandations par le propriétaire. Il s’agit d’une obligation de moyens et non de résultat.
+        </p>
+
+        <h2 id="s4">4. Rendez-vous et annulation</h2>
+        <p>
+          Les rendez-vous sont fixés d’un commun accord. Merci de prévenir au plus tôt en cas
+          d’empêchement. Les conditions d’annulation sont précisées lors de la prise de rendez-vous.
+        </p>
+
+        <h2 id="s5">5. Tarifs et paiement</h2>
+        <p>
+          Les tarifs en vigueur sont indiqués en francs suisses (CHF) sur la page <a href="/tarifs">Tarifs</a>. Les déplacements sont inclus dans un rayon de {site.radiusKm} km
+          autour de {site.base} ; au-delà, ils sont facturés {site.kmFee}. Le paiement s’effectue par
+          virement bancaire, TWINT ou en espèces.
+        </p>
+
+        <h2 id="s6">6. Responsabilité</h2>
+        <p>
+          Le propriétaire reste responsable de son animal, notamment pendant les séances. Il s’engage à
+          signaler tout antécédent de morsure, problème de santé ou comportement à risque. Pour la garde
+          à domicile, le propriétaire fournit les informations nécessaires (alimentation, soins,
+          contact vétérinaire) et garantit que l’animal est assuré en responsabilité civile.
+        </p>
+
+        <h2 id="s7">7. Propriété intellectuelle</h2>
+        <p>
+          Les textes, photographies et éléments graphiques du site sont la propriété de {site.owner},
+          sauf mention contraire. Toute reproduction sans autorisation écrite est interdite.
+        </p>
+
+        <h2 id="s8">8. Liens externes</h2>
+        <p>
+          Le site contient des liens vers des sites tiers. {site.name} n’exerce aucun contrôle sur leur
+          contenu et décline toute responsabilité à cet égard.
+        </p>
+
+        <h2 id="s9">9. Droit applicable et for</h2>
+        <p>
+          Les présentes conditions sont soumises au droit suisse. Le for juridique est à Genève, sous réserve des fors impératifs prévus par la loi, notamment en faveur des consommateurs, qui peuvent agir devant le tribunal de leur domicile.
+        </p>
+  </LegalPage>
+</Base>

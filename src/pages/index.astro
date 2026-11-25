@@ -1,0 +1,1097 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import Faq from '../components/Faq.astro';
+import PawTrail from '../components/PawTrail.astro';
+import DogEars from '../components/DogEars.astro';
+import PawIcon from '../components/PawIcon.astro';
+import PawBadge from '../components/PawBadge.astro';
+import CatWhiskers from '../components/CatWhiskers.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { site, faq, formations } from '../data/site';
+import { photos } from '../data/photos';
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faq.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const steps = [
+  { icon: 'phone-user', title: 'Premier contact', text: 'Vous m’expliquez la situation par formulaire, e-mail ou WhatsApp. Je vous réponds sous 48 h ouvrables.' },
+  { icon: 'pro-pets', title: 'Consultation', text: 'Je viens chez vous (1 h à 1 h 30) pour observer votre animal dans son environnement et comprendre son histoire.' },
+  { icon: 'head-idea', title: 'Plan sur mesure', text: 'Vous repartez avec des pistes concrètes, adaptées à votre quotidien et au rythme de votre animal.' },
+  { icon: 'book-paw', title: 'Suivi', text: 'Un appel de suivi permet d’ajuster le plan. Je reste disponible pour vous accompagner dans la durée.' },
+] as const;
+---
+
+<Base
+  title="Éducatrice canin et comportement chien et chat à Genève"
+  description="Éducatrice canin agréée SCAV à Genève : comportement du chien et du chat, éducation, soins coopératifs et garde à domicile. Méthodes respectueuses."
+  schema={[faqSchema]}
+>
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow">Comportement canin et félin à Genève</p>
+        <h1>Chaque binôme est <em class="accent">unique.</em></h1>
+        <p class="lead">
+          Faites le premier pas vers une relation plus claire et sereine avec votre animal. Ici, on ne
+          cherche pas la perfection, mais une véritable harmonie entre vous et votre compagnon, qu’il
+          soit chien ou chat.
+        </p>
+        <div class="btn-row">
+          <a href="/contact" class="btn">Prendre rendez-vous</a>
+          <a href="#prestations" class="btn btn--ghost">Découvrir les prestations</a>
+        </div>
+        <ul class="trust">
+          <li><Icon name="shield" size={18} /> Certifiée OSAV</li>
+          <li><Icon name="shield" size={18} /> Agréée SCAV (TMC)</li>
+          <li><Icon name="home" size={18} /> Consultations à domicile</li>
+          <li><Icon name="clock" size={18} /> Réponse sous 48 h</li>
+        </ul>
+      </div>
+
+      <div class="hero-art">
+        <div class="blob"></div>
+        <figure class="polaroid p1">
+          <Image src={photos.namakBouvier} alt="Namak, Léonberg, et Maybe, Bouvier bernois, assis côte à côte lors d’une promenade à Genève" widths={[260, 520]} sizes="260px" loading="eager" fetchpriority="high" />
+          <figcaption>Namak & Maybe</figcaption>
+        </figure>
+        <figure class="polaroid p2">
+          <Image src={photos.uka} alt="Mamie Uka, chatte écaille de tortue accompagnée en comportement félin à Genève" widths={[240, 480]} sizes="240px" loading="eager" />
+          <figcaption>Mamie Uka</figcaption>
+        </figure>
+        <figure class="polaroid p3">
+          <Image src={photos.olaf} alt="Olaf, jeune chien noir et feu suivi en éducation canine bienveillante" widths={[170, 340]} sizes="170px" loading="eager" />
+          <figcaption>Olaf</figcaption>
+        </figure>
+        <PawTrail class="hero-paws" />
+        <PawTrail class="hero-paws-cat" animal="cat" count={3} delay={1.6} />
+        <div class="chip">
+          <span class="chip-icon"><Icon name="paw" size={18} /></span>
+          <span><strong>Chiens & chats</strong><br />méthodes bienveillantes</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PRESTATIONS ============ -->
+  <section class="section pair-next" id="prestations">
+    <div class="container">
+      <div class="section-head center reveal">
+        <p class="eyebrow">Mes prestations</p>
+        <h2>Un accompagnement pour chaque compagnon</h2>
+        <p class="lead">
+          Éducation, troubles du comportement ou simple besoin de garde : chaque animal est unique,
+          chaque accompagnement aussi.
+        </p>
+      </div>
+
+      <div class="grid grid-2 species">
+        <a href="/chien" class="species-card reveal">
+          <div class="species-photo">
+            <Image src={photos.bergerBlanc} alt="Bosco, grand Berger blanc suisse, et N’Onyx, petit chien noir, au bord d’une rivière" widths={[260, 520, 800]} sizes="(max-width: 559px) 100vw, (max-width: 1199px) 50vw, 260px" />
+          </div>
+          <div class="species-body">
+            <p class="tag"><DogEars side="left" /> Chien <DogEars side="right" /></p>
+            <h3>Éducation & comportement canin</h3>
+            <ul class="checklist">
+              <li><PawIcon animal="dog" color="#46b59c" /> Éducation du chiot et de l’adulte</li>
+              <li><PawIcon animal="dog" color="#3ea5b1" /> Réactivité, peurs, agressivité</li>
+              <li><PawIcon animal="dog" color="#3896bf" /> Arrivée d’un bébé, adoption</li>
+              <li><PawIcon animal="dog" color="#3185c5" /> Medical training</li>
+            </ul>
+            <span class="link-arrow">Prestations chien</span>
+          </div>
+        </a>
+
+        <a href="/chat" class="species-card reveal">
+          <div class="species-photo">
+            <Image src={photos.chatons} alt="Deux chatons, un tigré et un gris et blanc, sur un arbre à chat" widths={[260, 520, 800]} sizes="(max-width: 559px) 100vw, (max-width: 1199px) 50vw, 260px" />
+          </div>
+          <div class="species-body">
+            <p class="tag"><CatWhiskers side="left" /> Chat <CatWhiskers side="right" /></p>
+            <h3>Comportement félin</h3>
+            <ul class="checklist">
+              <li><PawIcon animal="cat" color="#46b59c" /> Malpropreté, marquage</li>
+              <li><PawIcon animal="cat" color="#3ea5b1" /> Agressions, conflits entre chats</li>
+              <li><PawIcon animal="cat" color="#3896bf" /> Miaulements nocturnes, stress</li>
+              <li><PawIcon animal="cat" color="#3185c5" /> Introduction d’un nouvel animal</li>
+            </ul>
+            <span class="link-arrow">Prestations chat</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="garde-wrap reveal">
+        <a href="/garde-a-domicile" class="garde-pill">
+          <span class="gp-label">Garde à domicile</span>
+          <span class="gp-text">Votre animal est gardé pendant votre absence · dès CHF 30</span>
+          <span class="gp-cta">Voir les offres</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ APPROCHE ============ -->
+  <section class="section section--sand">
+    <div class="container">
+      <div class="section-head center reveal">
+        <p class="eyebrow">Mon approche</p>
+        <h2>Avec cœur, respect <em class="accent">et professionnalisme</em></h2>
+        <p class="lead">
+          Mon approche est fondée sur la compréhension, le respect et la collaboration, en s’appuyant
+          sur les connaissances actuelles en éthologie et en comportement animal. Ensemble, nous
+          construisons une relation durable, basée sur la confiance et l’écoute mutuelle, pour avancer
+          pas à pas, à votre rythme.
+        </p>
+      </div>
+      <div class="grid grid-3 approach">
+        <div class="card reveal">
+          <PawBadge size={140}><Icon name="hands-paw" size={46} /></PawBadge>
+          <h3>Comprendre</h3>
+          <p>
+            Observer votre animal dans son environnement, identifier ses besoins et les causes réelles
+            de son comportement, au-delà des symptômes.
+          </p>
+        </div>
+        <div class="card reveal">
+          <PawBadge size={140}><Icon name="meet" size={46} /></PawBadge>
+          <h3>Respecter</h3>
+          <p>
+            Des méthodes douces et coopératives, sans contrainte ni matériel aversif. L’animal apprend
+            mieux quand il se sent en sécurité.
+          </p>
+        </div>
+        <div class="card reveal">
+          <PawBadge size={140}><Icon name="heart-pets" size={46} /></PawBadge>
+          <h3>Accompagner</h3>
+          <p>
+            C’est le binôme humain-animal qui évolue. Je vous donne les clés pour devenir autonome, et
+            je reste à vos côtés le temps qu’il faut.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DEROULEMENT ============ -->
+  <section class="section section--sand pair-next">
+    <div class="container">
+      <div class="section-head center reveal">
+        <p class="eyebrow">Comment ça se passe</p>
+        <h2>Quatre étapes, en toute simplicité</h2>
+      </div>
+      <!-- Un chemin relie les 4 étapes ; une patte (chien, chat, chien) marque chaque passage.
+           Animation jouée une fois à l'arrivée à l'écran : chaque étape s'allume, puis le chemin avance vers la suivante. -->
+      <ol class="path" data-path>
+        {
+          steps.map((s, i) => (
+            <li class="path-step">
+              <span class="path-mark" aria-hidden="true">
+                <Icon name={s.icon} size={28} />
+                <span class="path-lit"><Icon name={s.icon} size={28} /></span>
+              </span>
+              {i < steps.length - 1 && (
+                <span class="path-seg" aria-hidden="true">
+                  <span class="path-fill" />
+                  <span class="path-paw">
+                    <PawIcon animal={i === 1 ? 'cat' : 'dog'} size={18} color="#46b59c" />
+                  </span>
+                </span>
+              )}
+              <span class="path-n" aria-hidden="true">0{i + 1}</span>
+              <h3>{s.title}</h3>
+              <p>{s.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+      <div class="path-cta reveal">
+        <a href="/contact" class="btn">Prendre rendez-vous</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ A PROPOS ============ -->
+  <section class="section section--blush">
+    <div class="container about">
+      <div class="about-photos reveal">
+        <figure class="polaroid a1">
+          <Image src={photos.brigitte} alt="Brigitte Trachsel, éducatrice canin agréée SCAV à Genève, entourée de ses Léonbergs" widths={[260, 520]} sizes="260px" />
+          <figcaption>Brigitte & ses Léonbergs</figcaption>
+        </figure>
+        <figure class="polaroid a2">
+          <Image src={photos.trio} alt="Namak le Léonberg avec les chattes Diablotine et Olympea : cohabitation chien et chat" widths={[260, 520]} sizes="260px" />
+          <figcaption>Namak, Diablotine & Olympea</figcaption>
+        </figure>
+      </div>
+      <div class="about-text reveal">
+        <div class="m-center">
+          <p class="eyebrow">Qui suis-je</p>
+          <h2>Brigitte Trachsel</h2>
+        </div>
+        <p class="lead">
+          Éducatrice canin agréée SCAV (TMC) et intervenante en comportement canin et félin. Je pourrais commencer par « Depuis toute
+          petite, j’aime les animaux », mais ce serait trop simple.
+        </p>
+        <p>
+          Mon père m’a transmis un respect du vivant profondément ancré : observer, écouter, s’adapter,
+          faire bouger sans brusquer. Puis Diablotine, Olympea et Namak sont entrés dans ma vie. Chacun
+          d’eux continue de m’apprendre, chaque jour, sur la relation, l’autre et moi-même.
+        </p>
+        <ul class="mini-formations">
+          {
+            formations.slice(0, 4).map((f) => (
+              <li>
+                <Icon name="cap" size={18} />
+                <span>
+                  <strong>{f.title}</strong> · {f.org}
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+        <div class="m-center">
+          <a href="/qui-suis-je" class="link-arrow">Mon parcours et mes formations</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ZONE ============ -->
+  <section class="section section--blush pair-next">
+    <div class="container zone">
+      <div class="reveal">
+        <div class="m-center">
+          <p class="eyebrow">Zone d’intervention</p>
+          <h2>Genève et ses environs</h2>
+        </div>
+        <p class="lead">
+          Je me déplace à votre domicile dans tout le canton. Les frais de déplacement sont inclus dans
+          un rayon de {site.radiusKm} km autour de {site.base}.
+        </p>
+        <p class="muted">
+          Notamment à Grand-Lancy, Lancy, Carouge, Onex, Plan-les-Ouates, Bernex, Confignon, Veyrier,
+          Genève centre, Vernier, Meyrin, Chêne-Bougeries et Thônex. Au-delà des {site.radiusKm} km : {site.kmFee}.
+          Consultations également en Suisse romande et en France voisine, et certaines consultations
+          pour chats sont possibles en ligne.
+        </p>
+      </div>
+      <div class="zone-map reveal" aria-hidden="true">
+        <svg viewBox="0 0 320 320">
+          <circle cx="160" cy="160" r="150" class="z-ring z3"></circle>
+          <circle cx="160" cy="160" r="105" class="z-ring z2"></circle>
+          <circle cx="160" cy="160" r="60" class="z-ring z1"></circle>
+          <circle cx="160" cy="160" r="9" class="z-dot"></circle>
+        </svg>
+        <span class="z-label z-center">{site.base}</span>
+        <span class="z-label z-edge">{site.radiusKm} km inclus</span>
+        <span class="z-label z-geneve">Genève</span>
+        <span class="z-label z-carouge">Carouge</span>
+        <span class="z-label z-onex">Onex</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FAQ ============ -->
+  <section class="section">
+    <div class="container faq-grid">
+      <div class="reveal">
+        <div class="m-center">
+          <p class="eyebrow">Questions fréquentes</p>
+          <h2>Vous vous posez des questions ?</h2>
+        </div>
+        <p class="lead">Voici les réponses aux questions qu’on me pose le plus souvent.</p>
+        <a href="/contact" class="link-arrow">Une autre question ? Écrivez-moi</a>
+      </div>
+      <div class="reveal"><Faq items={faq} /></div>
+    </div>
+  </section>
+
+  <CtaBand />
+</Base>
+
+<script>
+  // Déroulement : les étapes s'allument l'une après l'autre (une seule fois), le chemin avance
+  // vers l'étape suivante et une patte se pose au milieu. Sans JS ou avec « réduire les animations » :
+  // tout est affiché directement.
+  const path = document.querySelector<HTMLElement>('[data-path]');
+  const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (path && !calm && 'IntersectionObserver' in window) {
+    const items = [...path.querySelectorAll<HTMLElement>('.path-step')];
+    const STEP = 650; // ms entre deux étapes (le temps que le chemin rejoigne la suivante)
+    path.setAttribute('data-armed', '');
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        io.disconnect();
+        items.forEach((li, i) => {
+          window.setTimeout(() => li.classList.add('is-on'), i * STEP);
+          if (i < items.length - 1) window.setTimeout(() => li.classList.add('is-linked'), i * STEP + 120);
+        });
+      },
+      { threshold: 0.3 },
+    );
+    io.observe(path);
+  }
+</script>
+
+<style>
+  /* Petits intitulés au-dessus des titres : en minuscules, comme sur la page Chien */
+  .eyebrow {
+    font-size: clamp(0.95rem, 0.9rem + 0.3vw, 1.15rem);
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+    margin-bottom: 12px;
+  }
+  /* Deuxième section d'une paire (même fond que la précédente) : moins d'espace en haut */
+  .pair-next {
+    padding-top: clamp(24px, 4vw, 56px);
+  }
+
+  /* Titres centrés quand les sections passent sur une colonne (mobile / tablette) */
+  @media (max-width: 899px) {
+    .m-center {
+      text-align: center;
+    }
+  }
+
+  /* Hero */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding-block: clamp(40px, 6vw, 88px) clamp(64px, 8vw, 112px);
+  }
+  .hero-grid {
+    display: grid;
+    gap: 56px;
+    align-items: center;
+  }
+  @media (min-width: 960px) {
+    .hero-grid {
+      grid-template-columns: 1.1fr 0.9fr;
+    }
+  }
+  .hero h1 {
+    max-width: 13ch;
+  }
+  .hero .btn-row {
+    margin-top: 32px;
+  }
+  .trust {
+    list-style: none;
+    padding: 0;
+    margin: 36px 0 0;
+    /* 2 × 2 : diplômes sur la 1re ligne, service sur la 2e */
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, max-content));
+    gap: 12px 32px;
+    font-size: 0.93rem;
+    font-weight: 550;
+    color: var(--teal-900);
+  }
+  .trust li {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .trust :global(svg) {
+    color: var(--teal-600);
+  }
+
+  .hero-art {
+    position: relative;
+    height: clamp(360px, 38vw, 620px);
+    max-width: 640px;
+    width: 100%;
+    margin-inline: auto;
+  }
+  .blob {
+    position: absolute;
+    inset: 6% 4% 4% 8%;
+    background: var(--brand-gradient);
+    border-radius: 58% 42% 52% 48% / 46% 56% 44% 54%;
+    opacity: 0.95;
+  }
+  .hero-art .polaroid {
+    position: absolute;
+  }
+  .p1 {
+    width: 58%;
+    max-width: 270px;
+    top: 0;
+    left: 2%;
+    transform: rotate(-5deg);
+  }
+  .p2 {
+    width: 52%;
+    max-width: 250px;
+    bottom: 4%;
+    right: 0;
+    transform: rotate(4deg);
+  }
+  .p3 {
+    width: 34%;
+    max-width: 175px;
+    top: 10%;
+    right: 6%;
+    transform: rotate(7deg);
+  }
+  .p1 :global(img) {
+    aspect-ratio: 4/3;
+  }
+  .p2 :global(img) {
+    aspect-ratio: 4/3;
+  }
+  .p3 :global(img) {
+    aspect-ratio: 3/4;
+  }
+  .hero-art :global(.hero-paws) {
+    position: absolute;
+    width: 64px;
+    left: -14%;
+    top: 6%;
+    transform: rotate(-28deg);
+  }
+  .hero-art :global(.hero-paws-cat) {
+    position: absolute;
+    width: 52px;
+    right: -9%;
+    bottom: -2%;
+    transform: rotate(24deg);
+  }
+  /* Mobile / tablette : photos réorganisées (plus de chevauchement) et traces dans l'espace libre en bas à gauche */
+  @media (max-width: 959px) {
+    .hero-art {
+      height: 470px;
+      max-width: 420px;
+    }
+    .p1 {
+      width: 60%;
+      left: 0;
+      top: 2%;
+    }
+    .p3 {
+      width: 38%;
+      top: 0;
+      right: 2%;
+    }
+    .p2 {
+      width: 56%;
+      bottom: 0;
+      right: 0;
+    }
+    .hero-art :global(.hero-paws) {
+      width: 40px;
+      left: 0;
+      top: auto;
+      bottom: -4%;
+      transform: rotate(-20deg);
+    }
+    .hero-art :global(.hero-paws-cat) {
+      width: 34px;
+      right: auto;
+      left: 20%;
+      bottom: -6%;
+      transform: rotate(16deg);
+    }
+    /* Texte du haut centré sur mobile */
+    .hero-copy {
+      text-align: center;
+    }
+    .hero-copy h1,
+    .hero-copy .lead {
+      margin-inline: auto;
+    }
+    .hero-copy .btn-row,
+    .hero-copy .trust {
+      justify-content: center;
+    }
+  }
+  @media (max-width: 559px) {
+    /* une seule colonne, bloc centré, texte aligné à gauche : rien ne se coupe */
+    .trust {
+      grid-template-columns: max-content;
+      gap: 10px;
+      text-align: left;
+    }
+  }
+  .chip {
+    position: absolute;
+    left: 0;
+    bottom: 10%;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    background: var(--white);
+    border-radius: 16px;
+    padding: 12px 16px;
+    box-shadow: var(--shadow-lg);
+    font-size: 0.84rem;
+    line-height: 1.3;
+    color: var(--muted);
+  }
+  .chip strong {
+    color: var(--teal-950);
+  }
+  .chip-icon {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--apricot-soft);
+    color: #a3485a;
+  }
+  @media (max-width: 600px) {
+    .chip {
+      display: none;
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-art .polaroid,
+    .chip {
+      animation: float-in 0.9s var(--ease) both;
+    }
+    .p2 {
+      animation-delay: 0.12s !important;
+    }
+    .p3 {
+      animation-delay: 0.22s !important;
+    }
+    .chip {
+      animation-delay: 0.36s !important;
+    }
+  }
+  @keyframes float-in {
+    from {
+      opacity: 0;
+      translate: 0 18px;
+    }
+  }
+
+  /* Species cards */
+  .species-card {
+    display: grid;
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    transition:
+      transform 0.3s var(--ease),
+      box-shadow 0.3s var(--ease);
+  }
+  /* Photo à gauche quand la carte est assez large, sinon au-dessus (évite le texte écrasé vers 1000 px) */
+  @media (min-width: 560px) and (max-width: 719px), (min-width: 1200px) {
+    .species-card {
+      grid-template-columns: minmax(0, 260px) 1fr;
+    }
+  }
+  @media (hover: hover) {
+    .species-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      color: inherit;
+    }
+    .species-card:hover .link-arrow :global(svg) {
+      transform: translateX(3px);
+    }
+  }
+  .species-photo {
+    background: var(--teal-100);
+    min-height: 200px;
+  }
+  @media (max-width: 559px), (min-width: 720px) and (max-width: 1199px) {
+    .species-photo {
+      height: 220px;
+      min-height: 0;
+    }
+  }
+  .species-photo :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 22%;
+  }
+  .species-body {
+    padding: 28px;
+  }
+  .species-body .tag {
+    margin-bottom: 16px;
+    min-height: 46px; /* même hauteur avec oreilles ou moustaches : titres alignés */
+  }
+  .species-body .checklist {
+    margin: 16px 0 22px;
+    font-size: 0.96rem;
+  }
+  /* Garde : bouton compact */
+  .garde-wrap {
+    display: flex;
+    justify-content: center;
+    margin-top: 36px;
+  }
+  .garde-pill {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 6px 14px;
+    padding: 7px 7px 7px 22px;
+    border-radius: 999px;
+    background: var(--white);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-sm);
+    color: var(--muted);
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition:
+      border-color 0.25s var(--ease),
+      box-shadow 0.25s var(--ease);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .gp-label {
+    font-weight: 650;
+    color: var(--teal-950);
+  }
+  .gp-cta {
+    padding: 9px 20px;
+    border-radius: 999px;
+    /* Dégradé du logo, assombri pour que le texte blanc reste lisible */
+    background: linear-gradient(120deg, #2770a6 0%, #2b84a9 50%, #2f9690 100%) 0 0 / 200% 100%;
+    color: var(--white);
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 14px -6px rgb(49 133 197 / 0.6);
+    transition:
+      background-position 0.5s var(--ease),
+      box-shadow 0.3s var(--ease);
+  }
+  @media (hover: hover) {
+    .garde-pill:hover {
+      border-color: var(--teal-200);
+      box-shadow: var(--shadow);
+      color: var(--muted);
+    }
+    .garde-pill:hover .gp-cta {
+      background-position: 100% 0;
+      box-shadow: 0 6px 18px -6px rgb(70 181 156 / 0.7);
+    }
+  }
+  .garde-pill:active {
+    transform: scale(0.99);
+  }
+  @media (max-width: 640px) {
+    .garde-pill {
+      border-radius: 22px;
+      padding: 16px 18px;
+      text-align: center;
+    }
+  }
+
+  /* Mon approche : posé directement sur le fond de la section (pas de cadre), icônes sur mesure */
+  .approach {
+    row-gap: clamp(36px, 6vw, 48px);
+  }
+  .approach .card {
+    text-align: center;
+    /* sans cadre, moins de marge interne : les blocs restent groupés sous l'introduction */
+    padding-block: clamp(8px, 1.5vw, 16px);
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+  }
+  /* La patte « se pose » quand la carte apparaît à l'écran (visible aussi sur mobile) */
+  @media (prefers-reduced-motion: no-preference) {
+    .approach .card.is-visible :global(.paw-badge) {
+      animation: paw-stamp 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s backwards;
+    }
+    .approach .card:nth-child(2).is-visible :global(.paw-badge) {
+      animation-delay: 0.35s;
+    }
+    .approach .card:nth-child(3).is-visible :global(.paw-badge) {
+      animation-delay: 0.5s;
+    }
+  }
+  @keyframes paw-stamp {
+    0% {
+      transform: translateY(-14px) rotate(-14deg) scale(0.8);
+    }
+    55% {
+      transform: translateY(0) rotate(4deg) scale(1.06);
+    }
+    100% {
+      transform: none;
+    }
+  }
+  /* Au toucher sur mobile */
+  .approach .card:active :global(.paw-badge) {
+    transform: rotate(-8deg) scale(1.04);
+  }
+  /* La patte se tourne légèrement au survol de la carte */
+  @media (hover: hover) {
+    .approach .card:hover :global(.paw-badge) {
+      transform: rotate(-8deg) scale(1.04);
+    }
+  }
+  .approach .card p {
+    max-width: 34ch;
+    margin-inline: auto;
+  }
+
+  /* ============ Déroulement : chemin entre les 4 étapes ============ */
+  .path {
+    --mark: 60px;
+    --gap: 32px;
+    --rule: rgb(21 61 85 / 0.14);
+    list-style: none;
+    margin: 0 auto;
+    padding: 0;
+    display: grid;
+    gap: var(--gap);
+    max-width: 620px;
+  }
+  /* Mobile / tablette : chemin vertical à gauche, texte à droite */
+  .path-step {
+    position: relative;
+    padding-left: calc(var(--mark) + 22px);
+    min-height: var(--mark);
+  }
+  .path-mark {
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    left: 0;
+    display: grid;
+    place-items: center;
+    width: var(--mark);
+    height: var(--mark);
+    border-radius: 50%;
+    /* état « éteint » (visible seulement avant l'animation) */
+    border: 2px solid var(--rule);
+    background: var(--sand);
+    color: var(--teal-600);
+  }
+  /* Calque « allumé » posé par-dessus */
+  .path-lit {
+    position: absolute;
+    inset: -2px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--teal-600);
+    color: var(--white);
+    transition:
+      opacity 0.4s ease,
+      transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  /* Étape 4 = l'arrivée : dégradé du logo et halo */
+  .path-step:last-child .path-lit {
+    background: var(--brand-gradient);
+    box-shadow: 0 0 0 7px color-mix(in srgb, var(--teal-500) 18%, transparent);
+  }
+  /* Segment entre deux étapes (vertical) : du bas d'une pastille au haut de la suivante */
+  .path-seg {
+    position: absolute;
+    z-index: 1;
+    left: calc(var(--mark) / 2 - 1px);
+    top: var(--mark);
+    bottom: calc(-1 * var(--gap));
+    width: 2px;
+    background: var(--rule);
+  }
+  .path-fill {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, #3185c5, #46b59c);
+    transform-origin: top;
+    transition: transform 0.5s var(--ease);
+  }
+  /* La patte posée au milieu du segment (fond sable pour « couper » le trait) */
+  .path-paw {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--sand);
+    transform: translate(-50%, -50%) rotate(-12deg);
+    transition:
+      transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+      opacity 0.3s ease;
+  }
+  .path-n {
+    display: block;
+    font-family: var(--font-display);
+    font-size: clamp(2.2rem, 1.6rem + 2.4vw, 4rem);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    margin: 4px 0 12px;
+    background: linear-gradient(100deg, #3185c5, #46b59c);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .path-step h3 {
+    font-size: clamp(1.25rem, 1.15rem + 0.4vw, 1.45rem);
+    margin: 0 0 8px;
+  }
+  .path-step p {
+    margin: 0;
+    color: var(--muted);
+    max-width: 34ch;
+  }
+  .path-cta {
+    display: flex;
+    justify-content: center;
+    margin-top: clamp(40px, 5vw, 64px);
+  }
+
+  /* Écran large : 4 colonnes égales, chaque étape centrée sous sa pastille, chemin horizontal */
+  @media (min-width: 960px) {
+    .path {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      max-width: none;
+    }
+    .path-step {
+      padding-left: 0;
+      padding-top: calc(var(--mark) + 26px);
+      text-align: center;
+    }
+    .path-mark {
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .path-step p {
+      margin-inline: auto;
+    }
+    .path-seg {
+      left: calc(50% + var(--mark) / 2);
+      top: calc(var(--mark) / 2 - 1px);
+      bottom: auto;
+      width: calc(100% + var(--gap) - var(--mark));
+      height: 2px;
+    }
+    .path-fill {
+      background: linear-gradient(90deg, #3185c5, #46b59c);
+      transform-origin: left;
+    }
+  }
+
+  /* États de l'animation (uniquement quand le JS l'a préparée) */
+  .path[data-armed] .path-step :is(.path-n, h3, p) {
+    transition:
+      opacity 0.5s var(--ease),
+      transform 0.6s var(--ease);
+  }
+  .path[data-armed] .path-step:not(.is-on) :is(.path-n, h3, p) {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  .path[data-armed] .path-step:not(.is-on) .path-lit {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  .path[data-armed] .path-step:not(.is-linked) .path-fill {
+    transform: scaleY(0);
+  }
+  .path[data-armed] .path-step:not(.is-linked) .path-paw {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(-40deg) scale(0.4);
+  }
+  .path-step.is-linked .path-paw {
+    transition-delay: 0.25s;
+  }
+  @media (min-width: 960px) {
+    .path[data-armed] .path-step:not(.is-linked) .path-fill {
+      transform: scaleX(0);
+    }
+  }
+
+  /* About */
+  .about {
+    display: grid;
+    gap: 56px;
+    align-items: center;
+  }
+  @media (min-width: 900px) {
+    .about {
+      grid-template-columns: 0.9fr 1.1fr;
+    }
+  }
+  .about-photos {
+    position: relative;
+    /* Assez haut pour que la photo de Namak ne cache pas la légende « Olympea & Diablotine » */
+    height: 510px;
+    max-width: 460px;
+    width: 100%;
+    margin-inline: auto;
+  }
+  @media (max-width: 600px) {
+    .about-photos {
+      height: 400px;
+    }
+  }
+  .about-photos::before {
+    content: '';
+    position: absolute;
+    inset: 12% 10% 6% 6%;
+    border-radius: 40% 60% 50% 50% / 50% 40% 60% 50%;
+    background: color-mix(in srgb, var(--apricot) 24%, var(--blush));
+  }
+  .about-photos .polaroid {
+    position: absolute;
+  }
+  /* Portrait de Brigitte à gauche, la famille animale en bas à droite */
+  .a1 {
+    width: 47%;
+    max-width: 230px;
+    top: 0;
+    left: 0;
+    transform: rotate(-3deg);
+  }
+  .a1 :global(img) {
+    aspect-ratio: 2/3;
+  }
+  .a2 {
+    width: 50%;
+    max-width: 250px;
+    top: 40%;
+    right: 0;
+    transform: rotate(4deg);
+  }
+  .a2 :global(img) {
+    aspect-ratio: 4/3;
+  }
+  .mini-formations {
+    list-style: none;
+    padding: 0;
+    margin: 24px 0 28px;
+    display: grid;
+    gap: 12px;
+    font-size: 0.96rem;
+    color: var(--muted);
+  }
+  .mini-formations li {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .mini-formations strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .mini-formations :global(svg) {
+    flex: none;
+    margin-top: 3px;
+    color: var(--teal-600);
+  }
+
+  /* Zone */
+  .zone {
+    display: grid;
+    gap: 48px;
+    align-items: center;
+  }
+  @media (min-width: 900px) {
+    .zone {
+      grid-template-columns: 1.1fr 0.9fr;
+    }
+  }
+  .muted {
+    color: var(--muted);
+  }
+  .zone-map {
+    position: relative;
+    max-width: 360px;
+    width: 100%;
+    margin-inline: auto;
+    aspect-ratio: 1;
+  }
+  .zone-map svg {
+    width: 100%;
+    height: 100%;
+  }
+  .z-ring {
+    fill: none;
+    stroke: var(--teal-600);
+  }
+  .z3 {
+    fill: rgb(255 255 255 / 0.45);
+    stroke-dasharray: 4 6;
+    stroke-width: 1.5;
+  }
+  .z2 {
+    fill: rgb(255 255 255 / 0.6);
+    stroke-opacity: 0.35;
+  }
+  .z1 {
+    fill: rgb(255 255 255 / 0.85);
+    stroke-opacity: 0.4;
+  }
+  .z-dot {
+    fill: var(--apricot);
+    stroke: var(--white);
+    stroke-width: 4;
+  }
+  .z-label {
+    position: absolute;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--teal-900);
+    white-space: nowrap;
+    transform: translate(-50%, -50%);
+  }
+  .z-center {
+    left: 50%;
+    top: 58%;
+    background: var(--white);
+    padding: 4px 10px;
+    border-radius: 999px;
+    box-shadow: var(--shadow-sm);
+  }
+  .z-edge {
+    left: 50%;
+    top: 4%;
+    color: var(--teal-700);
+    background: var(--blush);
+    padding: 0 8px;
+  }
+  .z-geneve {
+    left: 66%;
+    top: 30%;
+  }
+  .z-carouge {
+    left: 72%;
+    top: 62%;
+  }
+  .z-onex {
+    left: 28%;
+    top: 40%;
+  }
+
+  /* FAQ */
+  .faq-grid {
+    display: grid;
+    gap: 40px;
+  }
+  @media (min-width: 900px) {
+    .faq-grid {
+      grid-template-columns: 0.8fr 1.2fr;
+      gap: 72px;
+    }
+  }
+</style>

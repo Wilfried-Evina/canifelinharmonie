@@ -1,0 +1,1297 @@
+---
+// Page Contact – la page qui transforme les visites en demandes : chaque détail compte.
+// Envoi : en production, script PHP du site (public/envoi-contact.php, hébergement Infomaniak).
+// En local, ou si l'envoi échoue, le visiteur a toujours une solution (e-mail pré-rempli, WhatsApp).
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import PawIcon from '../components/PawIcon.astro';
+import { site } from '../data/site';
+
+const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT || (import.meta.env.PROD ? '/envoi-contact.php' : '');
+---
+
+<Base
+  title="Contact et rendez-vous, comportement chien et chat à Genève"
+  description="Prenez rendez-vous avec Brigitte Trachsel, comportement chien et chat à Genève : formulaire, e-mail ou WhatsApp. Réponse sous 48 h ouvrables."
+>
+  <section class="ch-hero c-hero" id="top">
+    <div class="container ch-hero-head">
+      <p class="ch-kicker">Contact</p>
+      <h1 class="ch-title">
+        <span class="t-line">Parlons de votre compagnon.</span>
+        <span class="t-line grad">Réponse sous 48 h.</span>
+      </h1>
+      <p class="ch-sub">
+        Décrivez-moi la situation en quelques lignes. Je vous réponds sous {site.responseTime} pour
+        convenir d’un rendez-vous.
+      </p>
+      <p class="c-hero-alt ch-actions">
+        Plus rapide{' '}? <a href={site.whatsapp} target="_blank" rel="noopener"><Icon name="whatsapp" size={18} /> Écrivez-moi sur WhatsApp</a>
+      </p>
+    </div>
+  </section>
+
+  <section class="c-section">
+    <div class="container c-grid">
+      <!-- Contact direct : un seul panneau doux (au-dessus du formulaire sur mobile, à droite sur ordinateur) -->
+      <aside class="c-panel" aria-label="Me contacter directement">
+        <p class="c-panel-title">Plutôt en direct ?</p>
+        <p class="c-panel-sub">Une question rapide, une urgence : écrivez-moi sur WhatsApp.</p>
+        <a class="c-wa" href={site.whatsapp} target="_blank" rel="noopener">
+          <Icon name="whatsapp" size={20} />
+          Écrire sur WhatsApp
+        </a>
+        <ul class="c-rows">
+          <li>
+            <span class="c-ico"><Icon name="mail" size={18} /></span>
+            <span class="c-txt">
+              <span class="c-lbl">E-mail</span>
+              <a class="break" href={`mailto:${site.email}`}>{site.email}</a>
+            </span>
+          </li>
+          <li>
+            <span class="c-ico"><Icon name="phone" size={18} /></span>
+            <span class="c-txt">
+              <span class="c-lbl">Téléphone</span>
+              <a href={site.whatsapp} target="_blank" rel="noopener">{site.phoneDisplay}</a>
+            </span>
+          </li>
+          <li>
+            <span class="c-ico"><Icon name="pin" size={18} /></span>
+            <span class="c-txt">
+              <span class="c-lbl">Adresse</span>
+              <a href={site.mapsUrl} target="_blank" rel="noopener">{site.street}, <span class="nowrap">{site.postalCode} {site.base}</span></a>
+              <span class="c-note">Consultations à domicile dans tout le canton</span>
+            </span>
+          </li>
+          <li>
+            <span class="c-ico"><Icon name="clock" size={18} /></span>
+            <span class="c-txt">
+              <span class="c-lbl">Délai de réponse</span>
+              <span>Sous {site.responseTime}</span>
+            </span>
+          </li>
+        </ul>
+      </aside>
+
+      <div class="c-form-wrap">
+        <form class="c-form" id="contact-form" method="post" action={endpoint || undefined} data-endpoint={endpoint} novalidate>
+          <h2>Demande de rendez-vous</h2>
+          <p class="form-intro">Les champs marqués d’un * sont obligatoires.</p>
+
+          <div class="row-2">
+            <div class="field">
+              <label for="nom">Nom et prénom *</label>
+              <input id="nom" name="nom" type="text" autocomplete="name" required maxlength="120" aria-describedby="err-nom" />
+              <p class="f-err" id="err-nom">Indiquez votre nom.</p>
+            </div>
+            <div class="field">
+              <label for="telephone">Téléphone</label>
+              <input id="telephone" name="telephone" type="tel" autocomplete="tel" inputmode="tel" maxlength="40" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="email">E-mail *</label>
+            <input id="email" name="email" type="email" autocomplete="email" required maxlength="160" aria-describedby="err-email" />
+            <p class="f-err" id="err-email">Indiquez une adresse e-mail valide, par exemple nom@exemple.ch.</p>
+          </div>
+
+          <fieldset class="field">
+            <legend>Votre animal *</legend>
+            <div class="choices">
+              <label class="choice"><input type="radio" name="animal" value="Chien" required aria-describedby="err-animal" /> <span><PawIcon animal="dog" size={18} /> Chien</span></label>
+              <label class="choice"><input type="radio" name="animal" value="Chat" /> <span><PawIcon animal="cat" size={18} /> Chat</span></label>
+              <label class="choice"><input type="radio" name="animal" value="Chien et chat" /> <span><PawIcon animal="dog" size={16} /><PawIcon animal="cat" size={16} /> Les deux</span></label>
+            </div>
+            <p class="f-err" id="err-animal">Choisissez votre animal.</p>
+          </fieldset>
+
+          <div class="row-2">
+            <div class="field">
+              <label for="prestation">Prestation souhaitée *</label>
+              <select id="prestation" name="prestation" required aria-describedby="err-prestation" data-pretty>
+                <option value="">Choisir…</option>
+                <option value="comportement">Consultation comportement</option>
+                <option value="education">Éducation / cours</option>
+                <option value="adoption">Conseils avant adoption / nouvel arrivant</option>
+                <option value="bebe">Préparation à l’arrivée d’un bébé</option>
+                <option value="soins">Medical training / soins coopératifs</option>
+                <option value="garde">Garde à domicile</option>
+                <option value="autre">Autre question</option>
+              </select>
+              <p class="f-err" id="err-prestation">Choisissez une prestation.</p>
+            </div>
+            <div class="field">
+              <label for="infos-animal">Nom, âge et race</label>
+              <input id="infos-animal" name="infos_animal" type="text" maxlength="160" placeholder="Ex. Pixel, 3 ans, Maine Coon" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="message">Votre message *</label>
+            <textarea id="message" name="message" rows="6" required maxlength="5000" aria-describedby="err-message" placeholder="Décrivez la situation, depuis quand, ce que vous avez déjà essayé… Pour une garde : dates et nombre de visites."></textarea>
+            <p class="f-err" id="err-message">Décrivez votre demande en quelques mots.</p>
+          </div>
+
+          <div class="field">
+            <label for="source">Comment m’avez-vous connue ?</label>
+            <select id="source" name="source" data-pretty>
+              <option value="">Choisir…</option>
+              <option>Recherche Google</option>
+              <option>Bouche-à-oreille / un ami</option>
+              <option>Mon vétérinaire</option>
+              <option>Un éleveur</option>
+              <option>SPA / refuge</option>
+              <option>Réseaux sociaux</option>
+              <option>Autre</option>
+            </select>
+          </div>
+
+          <div class="field consent-field">
+            <label class="consent">
+              <input type="checkbox" name="consentement" value="oui" required aria-describedby="err-consent" />
+              <span>
+                J’accepte que mes données soient utilisées pour traiter ma demande, conformément à
+                la <a href="/politique-de-confidentialite">politique de confidentialité</a>. *
+              </span>
+            </label>
+            <p class="f-err" id="err-consent">Cochez cette case pour que je puisse traiter votre demande.</p>
+          </div>
+
+          <input type="text" name="_gotcha" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+          <button type="submit" class="btn submit">Envoyer ma demande</button>
+          <div class="form-status" role="status" aria-live="polite"></div>
+          <p class="form-help">
+            Je réponds en général par e-mail : pensez à vérifier vos courriers indésirables. Sans
+            nouvelles après {site.responseTime}, écrivez-moi sur{' '}
+            <a href={site.whatsapp} target="_blank" rel="noopener">WhatsApp</a>.
+          </p>
+        </form>
+
+        <!-- Confirmation affichée après un envoi réussi -->
+        <div class="c-done" id="contact-done" hidden tabindex="-1">
+          <span class="c-done-icon" aria-hidden="true"><Icon name="check" size={30} /></span>
+          <h2>Merci<span data-done-name></span> !</h2>
+          <p class="c-done-lead">Votre demande est bien partie. Je vous réponds sous {site.responseTime}.</p>
+          <ol class="c-done-steps">
+            <li>Je lis votre message et je vous recontacte, en général par e-mail.</li>
+            <li>Nous convenons ensemble d’un rendez-vous.</li>
+            <li>Pensez à vérifier vos courriers indésirables.</li>
+          </ol>
+          <a class="btn btn--ghost" href={site.whatsapp} target="_blank" rel="noopener">
+            <Icon name="whatsapp" size={18} /> Une urgence ? WhatsApp
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+  <hr class="page-sep" />
+</Base>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('#contact-form')!;
+  const done = document.querySelector<HTMLElement>('#contact-done')!;
+  const status = form.querySelector<HTMLElement>('.form-status')!;
+  const endpoint = form.dataset.endpoint;
+  const EMAIL = 'contact@canifelinharmonie.ch';
+  const WHATSAPP = `https://wa.me/41792096622?text=${encodeURIComponent('Bonjour Brigitte, je vous contacte depuis votre site canifelinharmonie.ch. ')}`;
+  const openedAt = Date.now();
+
+  // ---------- Brouillon : rien n'est perdu si la page est actualisée ou fermée ----------
+  // Gardé uniquement sur l'appareil du visiteur (localStorage), 7 jours au plus, effacé après l'envoi.
+  const DRAFT_KEY = 'ch-contact-draft';
+  const DRAFT_FIELDS = ['nom', 'telephone', 'email', 'animal', 'prestation', 'infos_animal', 'message', 'source', 'consentement'];
+  const saveDraft = () => {
+    try {
+      const d: Record<string, string | boolean> = { _t: String(Date.now()) };
+      DRAFT_FIELDS.forEach((n) => {
+        const el = form.elements.namedItem(n);
+        if (el instanceof RadioNodeList) d[n] = el.value;
+        else if (el instanceof HTMLInputElement && el.type === 'checkbox') d[n] = el.checked;
+        else if (el) d[n] = (el as HTMLInputElement).value;
+      });
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(d));
+    } catch {}
+  };
+  const clearDraft = () => {
+    try {
+      localStorage.removeItem(DRAFT_KEY);
+    } catch {}
+  };
+  try {
+    const d = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null');
+    if (d && Date.now() - Number(d._t) < 7 * 24 * 3600 * 1000) {
+      DRAFT_FIELDS.forEach((n) => {
+        const el = form.elements.namedItem(n);
+        if (d[n] === undefined || !el) return;
+        if (el instanceof RadioNodeList) el.value = String(d[n]);
+        else if (el instanceof HTMLInputElement && el.type === 'checkbox') el.checked = Boolean(d[n]);
+        else (el as HTMLInputElement).value = String(d[n]);
+      });
+    } else if (d) clearDraft();
+  } catch {}
+  form.addEventListener('input', saveDraft);
+  form.addEventListener('change', saveDraft);
+
+  // Pré-remplissage depuis le lien (?animal=chien|chat & ?prestation=garde|comportement|education…)
+  const params = new URLSearchParams(location.search);
+  const animalMap: Record<string, string> = { chien: 'Chien', chat: 'Chat' };
+  const animal = animalMap[params.get('animal') ?? ''];
+  if (animal) {
+    const radio = form.querySelector<HTMLInputElement>(`input[name="animal"][value="${animal}"]`);
+    if (radio) radio.checked = true;
+  }
+  const select = form.elements.namedItem('prestation') as HTMLSelectElement;
+  const wanted = params.get('prestation');
+  if (wanted && [...select.options].some((o) => o.value === wanted)) select.value = wanted;
+
+
+  // ---------- Menus déroulants sur mesure (liste crème) ----------
+  // Le vrai <select> reste dans le formulaire (valeur, validation, pré-remplissage) ;
+  // on affiche par-dessus un bouton et une liste accessibles au clavier.
+  const prettySelects = [...form.querySelectorAll<HTMLSelectElement>('select[data-pretty]')].map((sel) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'ps';
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'ps-btn';
+    btn.setAttribute('aria-haspopup', 'listbox');
+    btn.setAttribute('aria-expanded', 'false');
+    const label = form.querySelector<HTMLLabelElement>(`label[for="${sel.id}"]`);
+    if (label) {
+      label.id = `${sel.id}-label`;
+      btn.setAttribute('aria-labelledby', `${sel.id}-label ${sel.id}-value`);
+      label.addEventListener('click', (e) => {
+        e.preventDefault();
+        btn.focus();
+      });
+    }
+    const value = document.createElement('span');
+    value.className = 'ps-value';
+    value.id = `${sel.id}-value`;
+    btn.append(value);
+    const list = document.createElement('ul');
+    list.className = 'ps-list';
+    list.setAttribute('role', 'listbox');
+    list.id = `${sel.id}-list`;
+    list.tabIndex = -1;
+    btn.setAttribute('aria-controls', list.id);
+    const opts = [...sel.options].filter((o) => o.value !== '' || o.text !== 'Choisir…');
+    const items = opts.map((o, i) => {
+      const li = document.createElement('li');
+      li.setAttribute('role', 'option');
+      li.id = `${sel.id}-opt-${i}`;
+      li.dataset.value = o.value || o.text;
+      li.textContent = o.text;
+      li.addEventListener('mousedown', (e) => e.preventDefault());
+      li.addEventListener('click', () => choose(i));
+      li.addEventListener('mousemove', () => highlight(i));
+      list.append(li);
+      return li;
+    });
+    sel.classList.add('ps-native');
+    sel.tabIndex = -1;
+    sel.setAttribute('aria-hidden', 'true');
+    sel.after(wrap);
+    wrap.append(btn, list);
+
+    let active = -1;
+    const sync = () => {
+      const o = sel.options[sel.selectedIndex];
+      const empty = !sel.value;
+      value.textContent = empty ? 'Choisir…' : o.text;
+      btn.classList.toggle('is-empty', empty);
+      items.forEach((li) => li.setAttribute('aria-selected', String(!empty && li.dataset.value === (o.value || o.text))));
+    };
+    const highlight = (i: number) => {
+      active = i;
+      items.forEach((li, k) => li.classList.toggle('is-active', k === i));
+      if (i >= 0) {
+        btn.setAttribute('aria-activedescendant', items[i].id);
+        items[i].scrollIntoView({ block: 'nearest' });
+      }
+    };
+    const open = () => {
+      prettySelects.forEach((p) => p !== api && p.close());
+      wrap.classList.add('is-open');
+      btn.setAttribute('aria-expanded', 'true');
+      const cur = items.findIndex((li) => li.getAttribute('aria-selected') === 'true');
+      highlight(cur >= 0 ? cur : 0);
+    };
+    const close = () => {
+      wrap.classList.remove('is-open');
+      btn.setAttribute('aria-expanded', 'false');
+      btn.removeAttribute('aria-activedescendant');
+    };
+    const choose = (i: number) => {
+      sel.value = opts[i].value || opts[i].text;
+      sel.dispatchEvent(new Event('change', { bubbles: true }));
+      sel.dispatchEvent(new Event('input', { bubbles: true }));
+      sync();
+      close();
+      btn.focus();
+    };
+    btn.addEventListener('click', () => (wrap.classList.contains('is-open') ? close() : open()));
+    btn.addEventListener('keydown', (e) => {
+      const isOpen = wrap.classList.contains('is-open');
+      if (['ArrowDown', 'ArrowUp'].includes(e.key)) {
+        e.preventDefault();
+        if (!isOpen) return open();
+        const d = e.key === 'ArrowDown' ? 1 : -1;
+        highlight(Math.min(items.length - 1, Math.max(0, active + d)));
+      } else if (e.key === 'Enter' || e.key === ' ') {
+        if (isOpen && active >= 0) {
+          e.preventDefault();
+          choose(active);
+        } else if (!isOpen) {
+          e.preventDefault();
+          open();
+        }
+      } else if (e.key === 'Escape' && isOpen) {
+        e.preventDefault();
+        close();
+      } else if (e.key === 'Tab') {
+        close();
+      }
+    });
+    btn.addEventListener('blur', () => window.setTimeout(() => !wrap.contains(document.activeElement) && close(), 120));
+    sel.addEventListener('change', sync);
+    sync();
+    const api = { sel, btn, close, sync };
+    return api;
+  });
+  document.addEventListener('pointerdown', (e) => {
+    prettySelects.forEach((p) => !p.btn.parentElement!.contains(e.target as Node) && p.close());
+  });
+
+  const origin = (() => {
+    try {
+      return JSON.parse(sessionStorage.getItem('ch-origin') || '{}');
+    } catch {
+      return {};
+    }
+  })();
+
+  const setStatus = (html: string, type: 'ok' | 'error' | '' = '') => {
+    status.innerHTML = html;
+    status.dataset.type = type;
+  };
+
+  // Un champ corrigé perd son état d'erreur immédiatement
+  form.addEventListener('input', (e) => {
+    const el = e.target as HTMLInputElement;
+    if (form.classList.contains('was-validated')) el.setAttribute('aria-invalid', String(!el.checkValidity()));
+  });
+
+  const mailtoLink = (data: FormData, label: string) => {
+    const body = [
+      `Nom : ${data.get('nom')}`,
+      `E-mail : ${data.get('email')}`,
+      `Téléphone : ${data.get('telephone') || '-'}`,
+      `Animal : ${data.get('animal')}`,
+      `Prestation : ${label}`,
+      `Nom, âge, race : ${data.get('infos_animal') || '-'}`,
+      `Comment m’avez-vous connue : ${data.get('source') || '-'}`,
+      `Arrivée sur le site : ${origin.landing || '-'} (via ${origin.referrer || '-'})`,
+      'Envoyé depuis le site canifelinharmonie.ch',
+      '',
+      String(data.get('message')),
+    ].join('\n');
+    return `mailto:${EMAIL}?subject=${encodeURIComponent(`Demande de rendez-vous – ${label}`)}&body=${encodeURIComponent(body)}`;
+  };
+
+  const showDone = (name: string) => {
+    clearDraft();
+    const first = name.trim().split(/\s+/)[0];
+    done.querySelector('[data-done-name]')!.textContent = first ? ` ${first}` : '';
+    form.hidden = true;
+    done.hidden = false;
+    done.focus({ preventScroll: true });
+    done.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    form.classList.add('was-validated');
+    form.querySelectorAll<HTMLInputElement>('[required]').forEach((el) => el.setAttribute('aria-invalid', String(!el.checkValidity())));
+    if (!form.checkValidity()) {
+      const firstInvalid = form.querySelector<HTMLElement>(':invalid');
+      const pretty = prettySelects.find((p) => p.sel === firstInvalid);
+      (pretty ? pretty.btn : firstInvalid)?.focus();
+      setStatus('Il manque quelques informations, indiquées en rouge ci-dessus.', 'error');
+      return;
+    }
+    const data = new FormData(form);
+    if (data.get('_gotcha')) return;
+    const label = select.options[select.selectedIndex].text;
+
+    // Aperçu local (npm run dev, sans PHP) : rien n'est envoyé, on montre l'écran de confirmation
+    // avec une mention claire. En ligne, c'est le script envoi-contact.php qui envoie la demande.
+    if (!endpoint) {
+      const note = document.createElement('p');
+      note.className = 'c-dev-note';
+      note.innerHTML = `Aperçu local\u00a0: aucune demande n’est envoyée depuis votre ordinateur. Une fois le site en ligne, elle arrivera directement à ${EMAIL}. <a href="${mailtoLink(data, label)}">Envoyer quand même par e-mail</a>`;
+      done.querySelector('.c-dev-note')?.remove();
+      done.append(note);
+      showDone(String(data.get('nom') || ''));
+      return;
+    }
+
+    const btn = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    btn.disabled = true;
+    btn.textContent = 'Envoi en cours…';
+    setStatus('');
+    try {
+      data.set('prestation', label);
+      data.set('arrivee', origin.landing || '-');
+      data.set('provenance', origin.referrer || '-');
+      data.set('campagne', origin.utm || '-');
+      data.set('page', location.pathname + location.search);
+      data.set('_elapsed', String(Date.now() - openedAt));
+      const res = await fetch(endpoint, { method: 'POST', body: data, headers: { Accept: 'application/json' } });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok || !json.ok) throw new Error(String(res.status));
+      showDone(String(data.get('nom') || ''));
+    } catch {
+      // Rien n'est perdu : le visiteur garde son texte et a deux solutions immédiates
+      setStatus(
+        `L’envoi n’a pas abouti. Vos informations sont conservées : <a href="${mailtoLink(data, label)}">envoyer par e-mail</a> ou <a href="${WHATSAPP}" target="_blank" rel="noopener">m’écrire sur WhatsApp</a>.`,
+        'error',
+      );
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Envoyer ma demande';
+    }
+  });
+</script>
+
+<style>
+  /* ============================================================
+     Typographie « Apple »
+     ============================================================ */
+  .grad {
+    background: linear-gradient(100deg, #3185c5 10%, #3a9db4 50%, #46b59c 90%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .ch-kicker {
+    font-size: clamp(0.95rem, 0.9rem + 0.3vw, 1.15rem);
+    font-weight: 600;
+    color: var(--teal-700);
+    margin: 0 0 14px;
+  }
+  .ch-h2 {
+    font-size: clamp(2.2rem, 1.4rem + 3.4vw, 4.2rem);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 1.04;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .muted-line {
+    display: inline-block;
+    text-wrap: balance;
+    color: #8a97a3;
+  }
+  .ch-section-head {
+    margin-bottom: clamp(36px, 5vw, 64px);
+  }
+  .ch-section-head.center {
+    text-align: center;
+  }
+  .ch-center {
+    display: flex;
+    justify-content: center;
+    margin-top: clamp(40px, 5vw, 64px);
+  }
+
+  /* ============================================================
+     Hero
+     ============================================================ */
+  .ch-hero {
+    padding-top: clamp(48px, 7vw, 96px);
+    background: var(--cream);
+    overflow: hidden;
+  }
+  .ch-hero-head {
+    text-align: center;
+  }
+  .ch-title {
+    font-size: clamp(2.7rem, 1.2rem + 6vw, 6.6rem);
+    font-weight: 500;
+    letter-spacing: -0.035em;
+    line-height: 1.02;
+    margin: 0 auto 24px;
+    max-width: 22ch;
+  }
+  .t-line {
+    display: block;
+  }
+  .ch-sub {
+    font-size: clamp(1.1rem, 1rem + 0.5vw, 1.45rem);
+    color: var(--muted);
+    max-width: 40ch;
+    margin: 0 auto 32px;
+    line-height: 1.45;
+  }
+  .ch-actions {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .ch-price {
+    margin: 22px 0 0;
+    font-size: 0.95rem;
+    color: var(--muted);
+  }
+  .ch-price strong {
+    color: var(--teal-950);
+    font-weight: 600;
+  }
+  .ch-hero-media {
+    margin-top: clamp(40px, 6vw, 80px);
+    height: clamp(340px, 60vw, 860px);
+    overflow: hidden;
+    clip-path: inset(0 var(--gutter) round 28px);
+  }
+  .ch-hero-media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 45%;
+  }
+  /* Entrée en douceur du titre au chargement */
+  @media (prefers-reduced-motion: no-preference) {
+    .t-line,
+    .ch-sub,
+    .ch-actions,
+    .ch-price,
+    .ch-kicker {
+      animation: rise 0.9s var(--ease) both;
+    }
+    .ch-hero-head .ch-kicker {
+      animation-delay: 0s;
+    }
+    .t-line:nth-child(1) {
+      animation-delay: 0.08s;
+    }
+    .t-line:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    .ch-sub {
+      animation-delay: 0.32s;
+    }
+    .ch-actions {
+      animation-delay: 0.42s;
+    }
+    .ch-price {
+      animation-delay: 0.5s;
+    }
+    .ch-hero-media {
+      animation: media-in 1.2s var(--ease) 0.25s both;
+    }
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+  }
+  @keyframes media-in {
+    from {
+      opacity: 0;
+      transform: translateY(40px) scale(0.97);
+    }
+  }
+  /* L'image s'ouvre en pleine largeur au défilement (navigateurs compatibles) */
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .ch-hero-media {
+        animation:
+          media-in 1.2s var(--ease) 0.25s both,
+          media-open linear both;
+        animation-timeline: auto, scroll(root);
+        animation-range:
+          normal,
+          0px 640px;
+      }
+      .ch-hero-media :global(img) {
+        animation: media-zoom linear both;
+        animation-timeline: scroll(root);
+        animation-range: 0px 900px;
+      }
+    }
+  }
+  @keyframes media-open {
+    to {
+      clip-path: inset(0 0 round 0);
+    }
+  }
+  @keyframes media-zoom {
+    from {
+      transform: scale(1.12);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+
+
+  .c-hero {
+    padding-bottom: clamp(24px, 4vw, 48px);
+  }
+  .c-hero-alt {
+    margin: 4px 0 0;
+    color: var(--muted);
+  }
+  .c-hero-alt a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 4px;
+    color: #157a42;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .c-hero-alt :global(svg) {
+    color: #25d366;
+  }
+  .c-section {
+    background: var(--cream);
+    padding-block: clamp(16px, 3vw, 40px) clamp(88px, 11vw, 150px);
+  }
+
+  /* Mobile : panneau de contact puis formulaire. Ordinateur : formulaire à gauche, panneau collant à droite. */
+  .c-grid {
+    display: grid;
+    gap: 20px;
+  }
+  .c-panel {
+    order: 2;
+  }
+  @media (min-width: 960px) {
+    .c-grid {
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      column-gap: clamp(40px, 5vw, 96px);
+      align-items: start;
+    }
+    .c-form-wrap {
+      grid-column: 1;
+      grid-row: 1;
+    }
+    .c-panel {
+      order: 0;
+      grid-column: 2;
+      position: sticky;
+      top: 100px;
+    }
+  }
+
+  /* Panneau de contact : un lavis doux, des lignes calmes */
+  .c-panel {
+    padding: clamp(24px, 3vw, 36px);
+    border-radius: clamp(24px, 2.6vw, 32px);
+    background: var(--cream);
+  }
+  .c-panel-title,
+  .c-panel-sub {
+    text-align: center;
+  }
+  .c-panel-title {
+    margin: 0 0 4px;
+    font-family: var(--font-display);
+    font-size: clamp(1.35rem, 1.2rem + 0.6vw, 1.7rem);
+    color: var(--teal-950);
+  }
+  .c-panel-sub {
+    margin: 0 0 18px;
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  /* Lien WhatsApp simple, comme sous le titre : icône + texte vert, sans fond ni contour */
+  .c-wa {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 6px 0;
+    color: #157a42;
+    font-weight: 600;
+    font-size: 1.05rem;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+  }
+  .c-wa :global(svg) {
+    color: #25d366;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .c-wa:hover {
+      color: #157a42;
+      opacity: 0.8;
+    }
+  }
+  .c-rows {
+    list-style: none;
+    margin: 22px 0 0;
+    padding: 0;
+  }
+  .c-rows li {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 0;
+    border-top: 1px solid rgb(21 61 85 / 0.08);
+  }
+  .c-ico {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: none;
+    color: var(--teal-700);
+  }
+  .c-txt {
+    display: grid;
+    gap: 1px;
+    min-width: 0;
+    padding-top: 1px;
+    font-size: 0.95rem;
+    color: var(--ink);
+  }
+  .c-lbl {
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+  .c-txt a {
+    color: var(--ink);
+    text-decoration: none;
+    font-weight: 550;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .c-txt a:hover {
+      color: var(--teal-700);
+    }
+  }
+  .c-note {
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .nowrap {
+    white-space: nowrap;
+  }
+  .break {
+    overflow-wrap: anywhere;
+  }
+
+  /* Formulaire : surface blanche légère, champs pleins et doux, aucune bordure dure */
+  .c-form,
+  .c-done {
+    /* même fond que la page, un simple filet pour dessiner la carte */
+    background: var(--cream);
+    border-radius: clamp(24px, 2.6vw, 32px);
+    padding: clamp(24px, 4vw, 52px);
+  }
+  .c-form h2,
+  .c-done h2 {
+    font-size: clamp(1.6rem, 1.3rem + 1vw, 2.2rem);
+    font-weight: 450;
+    letter-spacing: -0.02em;
+    margin: 0 0 6px;
+  }
+  .c-form h2,
+  .form-intro {
+    text-align: center;
+  }
+  .form-intro {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin: 0 0 28px;
+  }
+  .row-2 {
+    display: grid;
+    gap: 0 18px;
+  }
+  @media (min-width: 640px) {
+    .row-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .field {
+    display: grid;
+    gap: 8px;
+    margin: 0 0 22px;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+  label,
+  legend {
+    font-weight: 550;
+    font-size: 0.9rem;
+    color: var(--teal-950);
+    padding: 0;
+  }
+  legend {
+    margin-bottom: 8px;
+  }
+  input[type='text'],
+  input[type='email'],
+  input[type='tel'],
+  select,
+  textarea {
+    width: 100%;
+    font: inherit;
+    font-size: 16px; /* évite le zoom automatique sur iPhone */
+    color: var(--ink);
+    background: var(--white);
+    border: 1px solid rgb(21 61 85 / 0.08);
+    border-radius: 16px;
+    padding: 14px 18px;
+    min-height: 54px;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+  input::placeholder,
+  textarea::placeholder {
+    color: #9ba6ad;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    input[type='text']:hover,
+    input[type='email']:hover,
+    input[type='tel']:hover,
+    select:hover,
+    textarea:hover {
+      border-color: rgb(21 61 85 / 0.16);
+    }
+  }
+  input:focus,
+  select:focus,
+  textarea:focus {
+    outline: none;
+    background: var(--white);
+    border-color: rgb(49 133 197 / 0.4);
+    box-shadow: 0 0 0 4px rgb(70 181 156 / 0.14);
+  }
+  textarea {
+    resize: vertical;
+    min-height: 150px;
+    line-height: 1.55;
+  }
+  select {
+    appearance: none;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%233a9db4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 44px;
+  }
+  .was-validated :invalid:not(fieldset):not([type='checkbox']):not([type='radio']) {
+    background-color: #fdf4f1;
+    border-color: rgb(196 98 78 / 0.45);
+  }
+
+  /* Choix de l'animal : sélecteur segmenté façon iOS */
+  .choices {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
+    padding: 5px;
+    border-radius: 18px;
+    background: #f2eae1;
+  }
+  .choice {
+    position: relative;
+    cursor: pointer;
+  }
+  .choice input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .choice span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 46px;
+    padding: 8px 6px;
+    border-radius: 14px;
+    color: var(--muted);
+    font-weight: 550;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+  .choice :global(svg) {
+    flex: none;
+    color: #b4bcc1;
+    transition: color 0.2s ease;
+  }
+  .choice input:checked + span {
+    background: var(--white);
+    color: var(--teal-950);
+    box-shadow:
+      0 1px 2px rgb(15 44 61 / 0.08),
+      0 6px 16px -8px rgb(15 44 61 / 0.18);
+  }
+  .choice input:checked + span :global(svg) {
+    color: var(--teal-600);
+  }
+  .choice input:focus-visible + span {
+    box-shadow: 0 0 0 3px rgb(70 181 156 / 0.35);
+  }
+  .choice:active span {
+    transform: scale(0.98);
+  }
+  .was-validated .choices:has(input:invalid) {
+    box-shadow: inset 0 0 0 1px rgb(196 98 78 / 0.45);
+  }
+  @media (max-width: 480px) {
+    .choice span {
+      font-size: 0.9rem;
+    }
+    /* « Les deux » : une seule patte pour tenir sur une ligne */
+    .choice :global(svg + svg) {
+      display: none;
+    }
+  }
+
+  /* Consentement : case arrondie et douce */
+  .consent-field {
+    margin: 4px 0 26px;
+  }
+  .consent {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    font-weight: 400;
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    cursor: pointer;
+  }
+  .consent input {
+    appearance: none;
+    flex: none;
+    width: 22px;
+    height: 22px;
+    margin: 1px 0 0;
+    border-radius: 7px;
+    border: 1.5px solid rgb(21 61 85 / 0.22);
+    background: var(--white);
+    cursor: pointer;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease;
+  }
+  .consent input:checked {
+    border-color: transparent;
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12 5 5L20 7'/%3E%3C/svg%3E") center / 14px no-repeat,
+      var(--brand-gradient);
+  }
+  .consent input:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 4px rgb(70 181 156 / 0.2);
+  }
+  .consent a {
+    color: var(--teal-700);
+  }
+  .was-validated .consent:has(input:invalid) input {
+    border-color: rgb(196 98 78 / 0.6);
+  }
+
+
+  /* Erreurs : douces, sous chaque champ, seulement après une tentative d'envoi */
+  .f-err {
+    display: none;
+    margin: 0;
+    font-size: 0.85rem;
+    color: #b4553f;
+  }
+  .was-validated .field:has(:invalid) .f-err {
+    display: block;
+  }
+
+  /* Bouton : pleine largeur, dégradé du logo, il s'enfonce légèrement à l'appui */
+  .submit {
+    width: 100%;
+    min-height: 56px;
+    border: 0;
+    background: linear-gradient(120deg, #2770a6 0%, #2b84a9 50%, #2f9690 100%);
+    box-shadow: 0 12px 26px -14px rgb(39 112 166 / 0.7);
+    font-size: 1rem;
+    transition:
+      transform 0.16s ease-out,
+      box-shadow 0.2s ease,
+      opacity 0.2s ease;
+  }
+  .submit:active {
+    transform: scale(0.98);
+  }
+  .submit:disabled {
+    opacity: 0.75;
+    cursor: progress;
+  }
+  .form-status {
+    margin: 16px 0 0;
+    font-weight: 550;
+    font-size: 0.93rem;
+    text-align: center;
+  }
+  .form-status:empty {
+    display: none;
+  }
+  .form-status[data-type='ok'] {
+    color: var(--teal-700);
+  }
+  .form-status[data-type='error'] {
+    color: #b4553f;
+  }
+  .form-status a {
+    color: inherit;
+    font-weight: 650;
+  }
+  .form-help {
+    margin: 16px auto 0;
+    max-width: 52ch;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .form-help a {
+    color: var(--teal-700);
+  }
+  .hp {
+    position: absolute;
+    left: -9999px;
+  }
+  .form-status {
+    margin: 16px 0 0;
+    font-weight: 550;
+    font-size: 0.95rem;
+  }
+  .form-status:empty {
+    display: none;
+  }
+  .form-status[data-type='ok'] {
+    color: var(--teal-700);
+  }
+  .form-status[data-type='error'] {
+    color: #b23a3a;
+  }
+  .form-status a {
+    color: inherit;
+    font-weight: 650;
+  }
+
+  .c-dev-note {
+    margin: 20px auto 0;
+    max-width: 46ch;
+    padding: 12px 16px;
+    border-radius: 14px;
+    background: #f2eae1;
+    color: var(--muted);
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+  .c-dev-note a {
+    color: var(--teal-700);
+    font-weight: 600;
+  }
+  /* Confirmation */
+  .c-done {
+    text-align: center;
+    outline: none;
+  }
+  .c-done-icon {
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 18px;
+    border-radius: 50%;
+    background: var(--brand-gradient);
+    color: var(--white);
+  }
+  .c-done-lead {
+    margin: 8px auto 24px;
+    max-width: 42ch;
+    color: var(--muted);
+    font-size: 1.08rem;
+  }
+  .c-done-steps {
+    margin: 0 auto 28px;
+    padding: 0;
+    max-width: 440px;
+    list-style: none;
+    counter-reset: s;
+    text-align: left;
+    border-top: 1px solid var(--line);
+  }
+  .c-done-steps li {
+    counter-increment: s;
+    display: flex;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink);
+  }
+  .c-done-steps li::before {
+    content: counter(s);
+    flex: none;
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    color: var(--teal-600);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .c-done:not([hidden]) {
+      animation: rise 0.6s var(--ease) both;
+    }
+  }
+</style>
+
+<style is:global>
+  /* Menus déroulants créés par le script : styles globaux, limités au formulaire de contact */
+  /* ---------- Menus déroulants sur mesure ---------- */
+  #contact-form .ps-native {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    opacity: 0;
+    pointer-events: none;
+  }
+  #contact-form .field:has(.ps) {
+    position: relative;
+  }
+  #contact-form .ps {
+    position: relative;
+  }
+  #contact-form .ps-btn {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 54px;
+    padding: 14px 44px 14px 18px;
+    border-radius: 16px;
+    border: 1px solid rgb(21 61 85 / 0.08);
+    background: var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%233a9db4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 16px center;
+    font: inherit;
+    font-size: 16px;
+    color: var(--ink);
+    text-align: left;
+    cursor: pointer;
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease,
+      background-position 0.2s ease;
+  }
+  #contact-form .ps-btn.is-empty .ps-value {
+    color: #9ba6ad;
+  }
+  #contact-form .ps-value {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    #contact-form .ps-btn:hover {
+      border-color: rgb(21 61 85 / 0.16);
+    }
+  }
+  #contact-form .ps-btn:focus-visible,
+  #contact-form .ps.is-open .ps-btn {
+    outline: none;
+    border-color: rgb(49 133 197 / 0.4);
+    box-shadow: 0 0 0 4px rgb(70 181 156 / 0.14);
+  }
+  #contact-form.was-validated .field:has(select:invalid) .ps-btn {
+    background-color: #fdf4f1;
+    border-color: rgb(196 98 78 / 0.45);
+  }
+  /* La liste : crème, arrondie, qui s'ouvre depuis le champ */
+  #contact-form .ps-list {
+    position: absolute;
+    z-index: 20;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    max-height: min(400px, 60vh);
+    overflow-y: auto;
+    margin: 0;
+    padding: 6px;
+    list-style: none;
+    border-radius: 18px;
+    background: var(--cream);
+    border: 1px solid rgb(21 61 85 / 0.08);
+    box-shadow:
+      0 2px 6px rgb(15 44 61 / 0.05),
+      0 24px 48px -20px rgb(15 44 61 / 0.28);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-4px) scale(0.98);
+    transform-origin: top center;
+    transition:
+      opacity 0.16s ease-out,
+      transform 0.18s cubic-bezier(0.23, 1, 0.32, 1),
+      visibility 0s linear 0.18s;
+    overscroll-behavior: contain;
+  }
+  #contact-form .ps.is-open .ps-list {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition:
+      opacity 0.16s ease-out,
+      transform 0.18s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  #contact-form .ps-list li {
+    position: relative;
+    padding: 12px 40px 12px 14px;
+    border-radius: 12px;
+    color: var(--ink);
+    font-size: 0.97rem;
+    line-height: 1.35;
+    cursor: pointer;
+    transition: background-color 0.12s ease;
+  }
+  #contact-form .ps-list li.is-active {
+    background: #f2eae1;
+  }
+  #contact-form .ps-list li[aria-selected='true'] {
+    color: var(--teal-800);
+    font-weight: 600;
+  }
+  #contact-form .ps-list li[aria-selected='true']::after {
+    content: '';
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    width: 16px;
+    height: 16px;
+    margin-top: -8px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233a9db4' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12 5 5L20 7'/%3E%3C/svg%3E") center / contain no-repeat;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #contact-form .ps-list {
+      transform: none !important;
+    }
+  }
+
+</style>

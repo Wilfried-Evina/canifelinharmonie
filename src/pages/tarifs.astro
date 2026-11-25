@@ -1,0 +1,546 @@
+---
+// Page Tarifs – même mise en scène que les pages Chien, Chat et Garde.
+// Fonds par paires : crème (hero + consultations), sable (garde chiens + garde chats), crème (infos pratiques + bandeau final).
+import Base from '../layouts/Base.astro';
+import PawIcon from '../components/PawIcon.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { consultations, garde, site, type Price } from '../data/site';
+
+type Group = { id: string; animal: 'dog' | 'cat'; title: string; rows: Price[]; link: { href: string; label: string } };
+
+const consultGroups: Group[] = [
+  { id: 'consultation-chien', animal: 'dog', title: 'Chiens', rows: consultations.chien, link: { href: '/chien', label: 'Détails des prestations chien' } },
+  { id: 'consultation-chat', animal: 'cat', title: 'Chats', rows: consultations.chat, link: { href: '/chat', label: 'Détails des prestations chat' } },
+];
+const gardeGroups: Group[] = [
+  { id: 'garde-chien', animal: 'dog', title: 'Chiens', rows: garde.chiens, link: { href: '/garde-a-domicile#chiens', label: 'Détails de la garde des chiens' } },
+  { id: 'garde-chat', animal: 'cat', title: 'Chats', rows: garde.chats, link: { href: '/garde-a-domicile#chats', label: 'Détails de la garde des chats' } },
+];
+
+const infos = [
+  { title: `${site.radiusKm} km inclus`, text: `Déplacements inclus autour de ${site.base}. Au‑delà : ${site.kmFee.replace(/ /g, ' ')}.` },
+  { title: 'Paiement', text: 'Par virement bancaire, TWINT ou espèces.' },
+  { title: 'Réponse sous 48 h', text: 'Je vous réponds dans les 48 heures ouvrables pour convenir d’un rendez-vous.' },
+];
+
+const pricingSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  '@id': `${site.url}/tarifs#catalogue`,
+  name: 'Tarifs éducation canine, comportement chien & chat et garde à domicile à Genève',
+  provider: { '@id': `${site.url}/#business` },
+  areaServed: ['Genève', 'Canton de Genève', 'Suisse romande', 'France voisine'],
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Prestations Canifelin Harmonie',
+    itemListElement: [
+      ...consultations.chien.map((r) => ({
+        '@type': 'Offer',
+        name: `Chien – ${r.name} (${r.duration})`,
+        price: r.price,
+        priceCurrency: 'CHF',
+        url: `${site.url}/chien#tarifs`,
+      })),
+      ...consultations.chat.map((r) => ({
+        '@type': 'Offer',
+        name: `Chat – ${r.name} (${r.duration})`,
+        price: r.price,
+        priceCurrency: 'CHF',
+        url: `${site.url}/chat#tarifs`,
+      })),
+      ...garde.chiens.map((r) => ({
+        '@type': 'Offer',
+        name: `Garde chien – ${r.name} (${r.duration})`,
+        price: r.price,
+        priceCurrency: 'CHF',
+        url: `${site.url}/garde-a-domicile#chiens`,
+      })),
+      ...garde.chats.map((r) => ({
+        '@type': 'Offer',
+        name: `Garde chat – ${r.name} (${r.duration})`,
+        price: r.price,
+        priceCurrency: 'CHF',
+        url: `${site.url}/garde-a-domicile#chats`,
+      })),
+    ],
+  },
+};
+---
+
+<Base
+  title="Tarifs éducation canine, comportement chien & chat et garde à Genève"
+  description="Tarifs à Genève : consultation comportement chien CHF 120, cours d’éducation dès CHF 60, consultation comportement chat dès CHF 80, garde à domicile et promenades dès CHF 30. Déplacements inclus (15 km autour de Grand-Lancy)."
+  schema={[pricingSchema]}
+>
+  <!-- ================= HERO ================= -->
+  <section class="ch-hero t-hero" id="top">
+    <div class="container ch-hero-head">
+      <p class="ch-kicker">Tarifs</p>
+      <h1 class="ch-title">
+        <span class="t-line">Des tarifs clairs.</span>
+        <span class="t-line grad">Sans surprise.</span>
+      </h1>
+      <p class="ch-sub">
+        Tous les prix en un coup d’œil. Les frais de déplacement sont inclus dans un rayon de {site.radiusKm} km autour de {site.base}.
+      </p>
+      <nav class="t-jump ch-actions" aria-label="Aller à">
+        <a href="#consultations">Consultations</a>
+        <a href="#garde">Garde à domicile</a>
+        <a href="#pratique">Infos</a>
+      </nav>
+    </div>
+  </section>
+
+  <!-- ================= CONSULTATIONS ================= -->
+  <section class="t-block t-cream" id="consultations">
+    <div class="container">
+      <div class="t-head reveal">
+        <h2 class="ch-h2">Consultations.<br /><span class="muted-line">Éducation et comportement.</span></h2>
+      </div>
+      <div class="t-groups">
+        {
+          consultGroups.map((g) => (
+            <div class="t-group reveal" id={g.id}>
+              <h3 class="t-group-title">
+                <PawIcon animal={g.animal} size={26} color="#3185c5" />
+                {g.title}
+              </h3>
+              <ul class="t-rows">
+                {g.rows.map((r) => (
+                  <li>
+                    <span class="t-name">
+                      <strong>{r.name}</strong>
+                      <span>{r.duration}</span>
+                    </span>
+                    <span class="t-price">
+                      <b>CHF {r.price}</b>
+                      <small>{r.unit}</small>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <a class="t-link" href={g.link.href}>{g.link.label}</a>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= GARDE ================= -->
+  <section class="t-block t-sand" id="garde">
+    <div class="container">
+      <div class="t-head reveal">
+        <h2 class="ch-h2">Garde à domicile.<br /><span class="muted-line">Il reste chez lui.</span></h2>
+      </div>
+      <div class="t-groups">
+        {
+          gardeGroups.map((g) => (
+            <div class="t-group reveal" id={g.id}>
+              <h3 class="t-group-title">
+                <PawIcon animal={g.animal} size={26} color="#3185c5" />
+                {g.title}
+              </h3>
+              <ul class="t-rows">
+                {g.rows.map((r) => (
+                  <li>
+                    <span class="t-name">
+                      <strong>{r.name}</strong>
+                      <span>{r.duration}{r.extra ? ` · ${r.extra}` : ''}</span>
+                    </span>
+                    <span class="t-price">
+                      <b>CHF {r.price}</b>
+                      <small>{r.unit}</small>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <a class="t-link" href={g.link.href}>{g.link.label}</a>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= INFOS PRATIQUES ================= -->
+  <section class="t-block t-cream t-last" id="pratique">
+    <div class="container">
+      <div class="t-head reveal">
+        <h2 class="ch-h2">Bon à savoir.</h2>
+      </div>
+      <ul class="t-infos">
+        {
+          infos.map((t) => (
+            <li class="t-info reveal">
+              <h3>{t.title}</h3>
+              <p>{t.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <CtaBand />
+</Base>
+
+<style>
+  /* ============================================================
+     Typographie « Apple »
+     ============================================================ */
+  .grad {
+    background: linear-gradient(100deg, #3185c5 10%, #3a9db4 50%, #46b59c 90%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .ch-kicker {
+    font-size: clamp(0.95rem, 0.9rem + 0.3vw, 1.15rem);
+    font-weight: 600;
+    color: var(--teal-700);
+    margin: 0 0 14px;
+  }
+  .ch-h2 {
+    font-size: clamp(2.2rem, 1.4rem + 3.4vw, 4.2rem);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 1.04;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .muted-line {
+    display: inline-block;
+    text-wrap: balance;
+    color: #8a97a3;
+  }
+  .ch-section-head {
+    margin-bottom: clamp(36px, 5vw, 64px);
+  }
+  .ch-section-head.center {
+    text-align: center;
+  }
+  .ch-center {
+    display: flex;
+    justify-content: center;
+    margin-top: clamp(40px, 5vw, 64px);
+  }
+
+  /* ============================================================
+     Hero
+     ============================================================ */
+  .ch-hero {
+    padding-top: clamp(48px, 7vw, 96px);
+    background: var(--cream);
+    overflow: hidden;
+  }
+  .ch-hero-head {
+    text-align: center;
+  }
+  .ch-title {
+    font-size: clamp(2.7rem, 1.2rem + 6vw, 6.6rem);
+    font-weight: 500;
+    letter-spacing: -0.035em;
+    line-height: 1.02;
+    margin: 0 auto 24px;
+    max-width: 22ch;
+  }
+  .t-line {
+    display: block;
+  }
+  .ch-sub {
+    font-size: clamp(1.1rem, 1rem + 0.5vw, 1.45rem);
+    color: var(--muted);
+    max-width: 40ch;
+    margin: 0 auto 32px;
+    line-height: 1.45;
+  }
+  .ch-actions {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .ch-price {
+    margin: 22px 0 0;
+    font-size: 0.95rem;
+    color: var(--muted);
+  }
+  .ch-price strong {
+    color: var(--teal-950);
+    font-weight: 600;
+  }
+  .ch-hero-media {
+    margin-top: clamp(40px, 6vw, 80px);
+    height: clamp(340px, 60vw, 860px);
+    overflow: hidden;
+    clip-path: inset(0 var(--gutter) round 28px);
+  }
+  .ch-hero-media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 45%;
+  }
+  /* Entrée en douceur du titre au chargement */
+  @media (prefers-reduced-motion: no-preference) {
+    .t-line,
+    .ch-sub,
+    .ch-actions,
+    .ch-price,
+    .ch-kicker {
+      animation: rise 0.9s var(--ease) both;
+    }
+    .ch-hero-head .ch-kicker {
+      animation-delay: 0s;
+    }
+    .t-line:nth-child(1) {
+      animation-delay: 0.08s;
+    }
+    .t-line:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    .ch-sub {
+      animation-delay: 0.32s;
+    }
+    .ch-actions {
+      animation-delay: 0.42s;
+    }
+    .ch-price {
+      animation-delay: 0.5s;
+    }
+    .ch-hero-media {
+      animation: media-in 1.2s var(--ease) 0.25s both;
+    }
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+  }
+  @keyframes media-in {
+    from {
+      opacity: 0;
+      transform: translateY(40px) scale(0.97);
+    }
+  }
+  /* L'image s'ouvre en pleine largeur au défilement (navigateurs compatibles) */
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .ch-hero-media {
+        animation:
+          media-in 1.2s var(--ease) 0.25s both,
+          media-open linear both;
+        animation-timeline: auto, scroll(root);
+        animation-range:
+          normal,
+          0px 640px;
+      }
+      .ch-hero-media :global(img) {
+        animation: media-zoom linear both;
+        animation-timeline: scroll(root);
+        animation-range: 0px 900px;
+      }
+    }
+  }
+  @keyframes media-open {
+    to {
+      clip-path: inset(0 0 round 0);
+    }
+  }
+  @keyframes media-zoom {
+    from {
+      transform: scale(1.12);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+
+
+  /* ============================================================
+     Tarifs
+     ============================================================ */
+  .t-hero {
+    padding-bottom: clamp(24px, 4vw, 56px);
+  }
+  /* Raccourcis vers les blocs, en pastilles discrètes */
+  .t-jump {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 8px;
+  }
+  .t-jump a {
+    padding: 10px 20px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--white);
+    color: var(--teal-950);
+    font-weight: 550;
+    text-decoration: none;
+    transition: border-color 0.2s ease, transform 0.16s ease-out;
+  }
+  @media (max-width: 480px) {
+    .t-jump {
+      gap: 8px;
+      flex-wrap: nowrap;
+    }
+    .t-jump a {
+      padding: 9px 14px;
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+  }
+  .t-jump a:active {
+    transform: scale(0.97);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .t-jump a:hover {
+      border-color: var(--teal-200);
+    }
+  }
+
+  .t-block {
+    padding-block: clamp(72px, 9vw, 128px);
+  }
+  .t-cream {
+    background: var(--cream);
+  }
+  .t-sand {
+    background: var(--sand);
+  }
+  /* la 1re section suit le hero sur le même fond crème */
+  #consultations {
+    padding-top: clamp(24px, 4vw, 56px);
+  }
+  .t-last {
+    padding-bottom: clamp(56px, 7vw, 96px);
+  }
+  .t-head {
+    margin-bottom: clamp(36px, 5vw, 64px);
+    text-align: center;
+  }
+
+  /* Deux colonnes : chiens | chats */
+  .t-groups {
+    display: grid;
+    gap: 56px;
+  }
+  @media (min-width: 900px) {
+    .t-groups {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: clamp(48px, 6vw, 112px);
+    }
+  }
+  .t-group {
+    display: flex;
+    flex-direction: column;
+    scroll-margin-top: 100px;
+  }
+  .t-group-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0 0 14px;
+    font-size: clamp(1.4rem, 1.2rem + 0.8vw, 2rem);
+    font-weight: 450;
+  }
+  .t-rows {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid rgb(21 61 85 / 0.14);
+  }
+  .t-rows li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 22px 0;
+    border-bottom: 1px solid rgb(21 61 85 / 0.14);
+  }
+  .t-name {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+  }
+  .t-name strong {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--teal-950);
+  }
+  .t-name span {
+    color: var(--muted);
+    font-size: 0.92rem;
+  }
+  .t-price {
+    display: grid;
+    justify-items: end;
+    text-align: right;
+    flex: none;
+  }
+  .t-price b {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 1.3rem + 1vw, 2.2rem);
+    font-weight: 450;
+    letter-spacing: -0.02em;
+    color: var(--teal-950);
+    white-space: nowrap;
+    line-height: 1.05;
+  }
+  .t-price small {
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+  .t-link {
+    align-self: flex-start;
+    margin-top: 18px;
+    font-weight: 600;
+    color: var(--teal-700);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  /* Infos pratiques : 3 colonnes séparées par des filets */
+  .t-infos {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    border-top: 1px solid rgb(21 61 85 / 0.12);
+  }
+  .t-info {
+    padding: 24px 8px;
+    text-align: center;
+  }
+  .t-info + .t-info {
+    border-top: 1px solid rgb(21 61 85 / 0.12);
+  }
+  .t-info h3 {
+    margin: 0 0 8px;
+    white-space: nowrap;
+    font-size: clamp(1.2rem, 1.05rem + 0.45vw, 1.45rem);
+    font-weight: 450;
+  }
+  .t-info p {
+    margin: 0 auto;
+    max-width: 30ch;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+  @media (min-width: 900px) {
+    .t-infos {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .t-info {
+      padding: clamp(28px, 3vw, 44px) 24px 0;
+    }
+    .t-info + .t-info {
+      border-top: 0;
+      border-left: 1px solid rgb(21 61 85 / 0.12);
+    }
+  }
+</style>
