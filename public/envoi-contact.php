@@ -285,7 +285,7 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 }
 
 // E-mail reçu par Brigitte
-$subject = $nom . ' – ' . $prestation . ' (demande via le site)';
+$subject = 'Demande de rendez-vous (site) – ' . $prestation;
 $body = implode("\n", [
     'Nouvelle demande envoyée depuis le site ' . SITE,
     '',
