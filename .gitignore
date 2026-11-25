@@ -6,5 +6,11 @@ node_modules/
 !.env.example
 .DS_Store
 
+# Interdiction formelle des archives dans Git
+*.zip
+*.tgz
+*.tar.gz
+
 # Documents et photos fournis par la cliente (privés, jamais dans Git)
 /pour Brian texte et photos/
+a-envoyer-sur-infomaniak/

@@ -13,11 +13,153 @@ const TO        = 'contact@canifelinharmonie.ch';
 const FROM      = 'contact@canifelinharmonie.ch';
 const SITE      = 'canifelinharmonie.ch';
 const MAX_PER_H = 6; // demandes maximum par heure et par adresse IP
+const SMTP_HOST_DEFAULT = 'mail.infomaniak.com';
+const SMTP_PORT_DEFAULT = 587;
 
+// Ne jamais afficher d'erreur PHP au visiteur (elle révélerait des chemins du serveur)
+ini_set('display_errors', '0');
 date_default_timezone_set('Europe/Zurich');
 header('Content-Type: application/json; charset=utf-8');
 header('X-Robots-Tag: noindex, nofollow');
 header('Cache-Control: no-store');
+
+/**
+ * Lit une variable de configuration depuis l'environnement serveur (SetEnv / getenv)
+ * ou depuis un fichier .env non versionné (au-dessus ou à côté du script, bloqué par .htaccess).
+ */
+function env_val(string $key, string $default = ''): string
+{
+    $v = getenv($key);
+    if (is_string($v) && $v !== '') {
+        return $v;
+    }
+    if (!empty($_ENV[$key])) {
+        return (string)$_ENV[$key];
+    }
+    if (!empty($_SERVER[$key])) {
+        return (string)$_SERVER[$key];
+    }
+    static $dotenv = null;
+    if ($dotenv === null) {
+        $dotenv = [];
+        foreach ([dirname(__DIR__) . '/.env', __DIR__ . '/.env'] as $path) {
+            if (is_readable($path)) {
+                foreach (file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [] as $line) {
+                    $line = trim($line);
+                    if ($line === '' || $line[0] === '#' || !str_contains($line, '=')) {
+                        continue;
+                    }
+                    [$k, $val] = explode('=', $line, 2);
+                    $k = trim($k);
+                    $val = trim($val);
+                    if (
+                        (str_starts_with($val, '"') && str_ends_with($val, '"')) ||
+                        (str_starts_with($val, "'") && str_ends_with($val, "'"))
+                    ) {
+                        $val = substr($val, 1, -1);
+                    }
+                    $dotenv[$k] = $val;
+                }
+                break;
+            }
+        }
+    }
+    return $dotenv[$key] ?? $default;
+}
+
+/**
+ * Envoi SMTP authentifié via STARTTLS (port 587, mail.infomaniak.com).
+ */
+function send_smtp(string $to, string $replyTo, string $subject, string $body): bool
+{
+    $host = env_val('SMTP_HOST', SMTP_HOST_DEFAULT);
+    $port = (int)env_val('SMTP_PORT', (string)SMTP_PORT_DEFAULT);
+    $user = env_val('SMTP_USER', FROM);
+    $pass = env_val('SMTP_PASS', '');
+
+    if ($pass === '') {
+        return false;
+    }
+
+    $fp = @stream_socket_client("tcp://{$host}:{$port}", $errno, $errstr, 10);
+    if (!$fp) {
+        return false;
+    }
+    stream_set_timeout($fp, 10);
+
+    $readCode = static function () use ($fp): int {
+        $code = 0;
+        while (($line = fgets($fp, 515)) !== false) {
+            $code = (int)substr($line, 0, 3);
+            if (isset($line[3]) && $line[3] === ' ') {
+                break;
+            }
+        }
+        return $code;
+    };
+
+    $cmd = static function (string $c, int $expect) use ($fp, $readCode): bool {
+        if (@fwrite($fp, $c . "\r\n") === false) {
+            return false;
+        }
+        return $readCode() === $expect;
+    };
+
+    if ($readCode() !== 220) {
+        fclose($fp);
+        return false;
+    }
+    if (!$cmd('EHLO ' . SITE, 250)) {
+        fclose($fp);
+        return false;
+    }
+    if (!$cmd('STARTTLS', 220)) {
+        fclose($fp);
+        return false;
+    }
+    $crypto = STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT;
+    if (defined('STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT')) {
+        $crypto |= STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT;
+    }
+    if (!@stream_socket_enable_crypto($fp, true, $crypto)) {
+        fclose($fp);
+        return false;
+    }
+    if (!$cmd('EHLO ' . SITE, 250) || !$cmd('AUTH LOGIN', 334)) {
+        fclose($fp);
+        return false;
+    }
+    if (!$cmd(base64_encode($user), 334) || !$cmd(base64_encode($pass), 235)) {
+        fclose($fp);
+        return false;
+    }
+    if (!$cmd('MAIL FROM:<' . FROM . '>', 250) || !$cmd('RCPT TO:<' . $to . '>', 250) || !$cmd('DATA', 354)) {
+        fclose($fp);
+        return false;
+    }
+
+    $msg = implode("\r\n", [
+        'Date: ' . date('r'),
+        'From: ' . mb_encode_mimeheader('Site Canifelin Harmonie', 'UTF-8') . ' <' . FROM . '>',
+        'To: <' . $to . '>',
+        'Reply-To: ' . $replyTo,
+        'Subject: ' . mb_encode_mimeheader($subject, 'UTF-8'),
+        'Message-ID: <' . bin2hex(random_bytes(12)) . '@' . SITE . '>',
+        'MIME-Version: 1.0',
+        'Content-Type: text/plain; charset=UTF-8',
+        'Content-Transfer-Encoding: 8bit',
+        'X-Mailer: ' . SITE,
+        '',
+        // Points en début de ligne doublés, et fins de ligne CRLF obligatoires (pas de « LF » seul,
+        // refusé par les serveurs mail récents)
+        str_replace("\n", "\r\n", preg_replace('/^\./m', '..', str_replace(["\r\n", "\r"], "\n", $body)) ?? $body),
+    ]);
+
+    $ok = $cmd($msg . "\r\n.", 250);
+    @fwrite($fp, "QUIT\r\n");
+    fclose($fp);
+    return $ok;
+}
 
 function reply(bool $ok, int $code = 200, string $error = ''): void
 {
@@ -145,7 +287,13 @@ $headers = implode("\r\n", [
     'X-Mailer: canifelinharmonie.ch',
 ]);
 
-$sent = @mail(TO, mb_encode_mimeheader($subject, 'UTF-8'), $body, $headers, '-f' . FROM);
+// Priorité à l'envoi SMTP authentifié (mail.infomaniak.com:587 STARTTLS) si SMTP_PASS est défini
+// sur le serveur (.env ou variable d'environnement) ; repli sur mail() natif sinon.
+$sent = send_smtp(TO, $email, $subject, $body);
+// mail() est désactivée sur certains hébergements Infomaniak : on ne l'appelle que si elle existe
+if (!$sent && function_exists('mail')) {
+    $sent = @mail(TO, mb_encode_mimeheader($subject, 'UTF-8'), $body, $headers, '-f' . FROM);
+}
 if (!$sent) {
     reply(false, 500, 'mail');
 }

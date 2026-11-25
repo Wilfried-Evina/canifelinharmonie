@@ -31,7 +31,7 @@ const canonical = new URL(cleanPath, site.url).href;
 const resolvedOg =
   typeof image === 'string'
     ? image
-    : (await getImage({ src: image, width: 1200, format: 'jpg', quality: 80 })).src;
+    : (await getImage({ src: image, width: 1200, height: 630, fit: 'cover', format: 'jpg', quality: 68 })).src;
 const ogImage = new URL(resolvedOg, site.url).href;
 
 const breadcrumbNames: Record<string, string> = {

@@ -15,7 +15,8 @@ export default defineConfig({
   site: 'https://canifelinharmonie.ch',
   integrations: [
     sitemap({
-      filter: (page) => !excludedFromSitemap.some((path) => page.includes(path)),
+      // comparaison exacte du chemin (« /liens-utile » ne doit pas exclure « /liens-utiles »)
+      filter: (page) => !excludedFromSitemap.includes(new URL(page).pathname.replace(/\/$/, '')),
       serialize: (item) => {
         const url = item.url.replace(/\/$/, '');
         const highPriority = [

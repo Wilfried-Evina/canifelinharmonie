@@ -1,6 +1,11 @@
 # Configuration Apache – hébergement Infomaniak
 # Ce fichier est copié tel quel à la racine du site lors du build (dist/.htaccess).
 
+# ---------- Sécurité : interdire tout accès HTTP aux fichiers cachés (.env, .git…) ----------
+<FilesMatch "^\.">
+  Require all denied
+</FilesMatch>
+
 # ---------- Pages d'erreur ----------
 ErrorDocument 404 /404.html
 
