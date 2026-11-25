@@ -163,6 +163,36 @@ function send_smtp(string $to, string $replyTo, string $subject, string $body, s
         // Version HTML (avec logo) + version texte pour les messageries qui n'affichent pas le HTML.
         // Le HTML est encodé en base64 : aucune ligne trop longue, aucun point en début de ligne.
         $b = 'chf-' . bin2hex(random_bytes(10));
+        $htmlPart = [
+            'Content-Type: text/html; charset=UTF-8',
+            'Content-Transfer-Encoding: base64',
+            '',
+        ];
+        // Logo joint à l'e-mail (image intégrée « cid: ») : affiché même quand la messagerie
+        // bloque les images venant d'Internet. Sinon, repli sur l'adresse du site.
+        $logo = @file_get_contents(__DIR__ . '/email-logo.png');
+        if ($logo !== false && $logo !== '') {
+            $r = 'chfr-' . bin2hex(random_bytes(10));
+            $cid = 'logo@' . SITE;
+            $html = str_replace('https://' . SITE . '/email-logo.png', 'cid:' . $cid, $html);
+            $alt = [
+                'Content-Type: multipart/related; boundary="' . $r . '"',
+                '',
+                '--' . $r,
+                ...$htmlPart,
+                rtrim(chunk_split(base64_encode($html), 76, "\r\n")),
+                '--' . $r,
+                'Content-Type: image/png; name="logo.png"',
+                'Content-Transfer-Encoding: base64',
+                'Content-ID: <' . $cid . '>',
+                'Content-Disposition: inline; filename="logo.png"',
+                '',
+                rtrim(chunk_split(base64_encode($logo), 76, "\r\n")),
+                '--' . $r . '--',
+            ];
+        } else {
+            $alt = [...$htmlPart, rtrim(chunk_split(base64_encode($html), 76, "\r\n"))];
+        }
         $parts = array_merge($head, [
             'Content-Type: multipart/alternative; boundary="' . $b . '"',
             '',
@@ -172,10 +202,7 @@ function send_smtp(string $to, string $replyTo, string $subject, string $body, s
             '',
             $text,
             '--' . $b,
-            'Content-Type: text/html; charset=UTF-8',
-            'Content-Transfer-Encoding: base64',
-            '',
-            rtrim(chunk_split(base64_encode($html), 76, "\r\n")),
+            ...$alt,
             '--' . $b . '--',
         ]);
     }
