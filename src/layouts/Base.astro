@@ -27,7 +27,7 @@ const {
 } = Astro.props;
 const fullTitle = title.includes('Canifelin') ? title : `${title} | Canifelin Harmonie`;
 const cleanPath = Astro.url.pathname === '/' ? '/' : Astro.url.pathname.replace(/\/$/, '');
-const canonical = new URL(cleanPath, site.url).href;
+const canonical = new URL(cleanPath === '/' ? '/' : `${cleanPath}/`, site.url).href; // le serveur ajoute le « / » final
 const resolvedOg =
   typeof image === 'string'
     ? image
@@ -88,7 +88,7 @@ const business = {
     '@id': `${site.url}/qui-suis-je#person`,
     name: site.owner,
     jobTitle: 'Éducatrice canin agréée SCAV (TMC) et intervenante en comportement canin et félin',
-    url: `${site.url}/qui-suis-je`,
+    url: `${site.url}/qui-suis-je/`,
   },
   address: {
     '@type': 'PostalAddress',
